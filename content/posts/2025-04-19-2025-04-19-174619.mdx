@@ -1,0 +1,266 @@
+---
+title: "【AUTOSAR】Specification of Execution Managementを読んでみる"
+date: "2025-04-19"
+description: "確認するべきこと - これを最初にExacution Manifestで確認しよう - 自分のアプリがどのFGに属するか - 他アプリとの依存関係は？ - 起動タイムアウト(https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A..."
+category: "IT"
+tags: []
+image: ""
+---
+
+確認するべきこと
+
+- これを最初にExacution Manifestで確認しよう
+
+- 自分のアプリがどのFGに属するか
+
+- 他アプリとの依存関係は？
+
+- 起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)に関わるnumberOfRestartAttemptsは？
+
+- 理解しておきたい「状態」について
+
+- Execution State：プロセス自身のライフサイクル（kStarting, kRunning, kTerminating, kTerminatedなど）
+
+- Process State：EM 内部の状態管理（Idle, Running, Terminatedなど
+
+- Machine State：プラットフォーム全体の状態（Startup, Running, Shutdown）
+
+- Function Group State：アプリケーションの論理的なまとまり単位の状態
+
+- SM、PHMとやりとりをする
+
+- SMからの状態遷移指示でEMがプロセスを起動/停止
+
+- EMが受け取ったアプリのkRunnningレポートによってPHMがプロセス監視を開始
+
+- 起動時[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)がやばい
+
+- [タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)が発生した場合、EMは設定された回数（numberOfRestartAttempts で定義）まで再起動を試行
+
+- 再試行回数を超えると、EMはプロセスをOSにより強制終了（sigkill等）させる
+
+
+
+##### EMはプロセス初期化完了をkRunningのレポートで検知する
+
+- 依存関係の都合上不確定な遅延を防ぐため、kRunningのレポートは初期化完了後Service Discovery前にレポートすることが望まれる
+
+- Terminationで使われるSigtermは丁寧な終了方法
+
+- ちゃんとアプリは後片付けをしてから終了してくれる（Service Discoveryとかを切ってくれるイメージ）
+
+- kRunningのreport前でもsigtermは送られる可能性あり
+
+- EMはアプリの実行状態を把握しているのでアプリが異常終了した場合はsigtermを送らない
+
+- アプリはsigtermを受信したら不揮発保存を走らせ、リソースを解放
+
+- 不揮発保存やSeviceDiscoveyの終了は任意（アプリ内の実装に依存）するイメージだけどどうなんだろう
+
+- いちばん嫌な「Unexpected Termination」について
+
+-
+
+該当プロセスが属する Function Group の状態が「Undefined」に設定される
+
+→だから異常終了するとメッセージに「Undefined」が出る
+
+##### アプリからのレポートについて
+
+- 自身の状態（Initializing, Running, Terminating）をEMに報告する義務がある
+
+- 報告しないアプリも作れるらしいが、その場合の例外についてつらつら書かれていた
+
+##### プロセスの状態について
+
+### ![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250419163726.png)**
+
+- Idle：プロセスがまだ生成されていない状態。リソース未割り当て
+
+- Starting：プロセスが生成。リソースが割り当て
+
+- Running：Reporting Process が kRunning を報告した後
+
+- Terminating：sigterm を受け取り、終了処理を実行中
+
+- Terminated：プロセスが完全に終了し、リソースが解放
+
+##### PHMとの同期
+
+-
+
+アプリをただ動かしたい身からすれば（自分達からみた）異常終了の原因となるのでやっかいなPHM
+
+-
+
+PHMは、プロセスの状態を元に監視（Supervision）を開始、停止する。具体的には、Runningに遷移したときに監視を開始、Terminating状態になる準備が整ったときに監視を停止する
+
+-
+
+EMはアプリからRunningの報告が上がってきた時に、PHMに報告する
+
+-
+
+PHMはEMからのRunning報告契機でそのプロセスを監視対象として「Alive Supervision」を開始。Alive Supervisionとは、プロセスが正常に動作しているかを監視するための監視機能である
+
+-
+
+一旦PHMはウォッチドックみたいなものだと思おう
+
+-
+
+PHMが異常終了を検知したときにPF全体でどう動くのか知りたい、、、プロセスの状態報告は適宜DLTログに出るらしい
+
+##### プロセスの実行依存関係
+
+- Execution Manifestsに設定される（見たことがないので見てみたい）
+
+-
+
+例が挙げられている
+
+-
+
+プロセスBがプロセスAに依存している場合、プロセスAがRunningに達してからプロセスBを開始
+
+-
+
+例えばプロセスAはStrage、プロセスBはロガー
+
+-
+
+実行依存関係は 同一のFunction Group StateまたはMachine State内で完結する必要がある（別のFGに依存されるとエラーが起きる）
+
+-
+
+どうしてもFGを跨ぎたい場合はSMを使用する
+
+##### マシン起動のシーケンス
+
+- 最初に起動されるプロセスがEM
+
+- OSやドライバなどのプロセスはEMより前に起動（AUTOSAR PFとして最初に起動されるのがEMという意味かと）
+
+- EM が準備完了後、Machine State を Off → Startup へ遷移
+
+- Startup 状態に属するプロセスを、Execution Management が起動
+
+- 遷移条件が満たされたら、EMはSMにStartup遷移完了を通知
+
+- 起動完了後は、Function Group の状態管理はSMに引き継がれる
+
+- EM は Machine ManifestとExecution Manifestを元に起動順序を決定
+
+-
+
+#####
+
+##### SMについて
+
+- 結局SMが大元にいて、EMはアプリの実行停止を担当しその状態をSMに報告する
+
+-
+
+SMはAUTOSAR Adaptive Platform 全体の動作状態を定義・制御する役割を持つ
+
+- 一方で、EMは、その状態間の遷移を実行する
+
+- 以下の状態があるよと復習させてくれる
+
+- Execution State：プロセス自身のライフサイクル（kStarting, kRunning, kTerminating, kTerminatedなど）
+
+- Process State：EM 内部の状態管理（Idle, Running, Terminatedなど）
+
+- Machine State：プラットフォーム全体の状態（Startup, Running, Shutdown）
+
+- Function Group State：アプリケーションの論理的なまとまり単位の状態
+
+##### Machine Stateについて
+
+- Machineごとに1つの 「MachineFG」を定義することが必須
+
+- MachineFG は起動・終了シーケンスを制御するためのFunction Group
+
+- EMが最初に起動され、Machine State を制御実際の状態遷移要求（state change）は、SMから発行
+
+- 必須の状態
+
+- Off：プラットフォームがシャットダウン状態
+
+- Verify：初期チェックやバリデーション（暗号署名など）
+
+- Startup：起動シーケンス実行中（EMがここで起動される）
+
+- Shutdown：終了シーケンス
+
+- Restart
+
+- StartupからStateXYZへの遷移
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250419181943.png)
+
+- OSがmain()に入ってEMを起こす
+
+- EMはSMを起動
+
+- SMはExecution StateをKRunningとしてEMに報告
+
+- SMはMachine StateをstateXYZにセット
+
+- FGの状態遷移
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250419183458.png)
+
+- EMは現在のFGに属するプロセスをTerminate
+
+- 新しいFGに属するプロセスを起動
+
+- FGの状態遷移時の起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250419183957.png)
+
+- 起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)するとFGの状態遷移は中止
+
+- SMへ失敗を報告
+
+- 起動失敗は致命的なエラーとなる
+
+- EMは起動直後、自動的に Startup状態への遷移を試みる
+
+- Startupへの遷移に失敗した場合、EMはUnrecoverable State（回復[不能](https://d.hatena.ne.jp/keyword/%C9%D4%C7%BD)状態）へ移行
+
+Function Group State
+
+- アプリケーション群
+
+- SMが状態遷移を制御。FGに応じたアプリをEMが起動する
+
+- 以下の図が状態遷移をよく表している
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250419194910.png)
+
+- この後はFGにまたがるプロセスと複数プロセスの依存について書かれている
+
+プロセス終了処理の[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)
+
+- EMはプロセスの終了にかかる時間を監視
+
+- 終了が[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)すると、EMはOSに強制終了（sigkill等）を要求する
+
+- sigtermはお行儀のよい終了方法でsigkillはOSレベルで実行される強制終了
+
+起動時の[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)
+
+- EMはプロセスがRunningになるまでの時間を監視
+
+- [タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)が発生した場合、EMは設定された回数（numberOfRestartAttempts で定義）まで再起動を試行
+
+- 再試行回数を超えると、EMはプロセスをOSにより強制終了（sigkill等）させる
+
+- 起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)が発生すると、遷移先の状態（RequestedState）には到達[不能](https://d.hatena.ne.jp/keyword/%C9%D4%C7%BD)
+
+- EMはSMに失敗を報告
+
+FG状態遷移時のエラー
+
+- CurrentStateをUndefined Function Group Stateに設定

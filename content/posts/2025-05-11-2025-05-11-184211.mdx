@@ -1,0 +1,308 @@
+---
+title: "【AUTOSAR】Specification of Communication Management（R21-11）を読んでみる（~7.8.1.4）"
+date: "2025-05-11"
+description: "SWS_CM_10384 / SWS_CM_10385 - サービスインターフェースのデプロイメントの変更はアプリの再コンパイル(https://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB)なしで可能である必要がある - アプリを再度コ..."
+category: "IT"
+tags: []
+image: ""
+---
+
+###### SWS_CM_10384 / SWS_CM_10385
+
+- サービスインターフェースのデプロイメントの変更はアプリの再[コンパイル](https://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB)なしで可能である必要がある
+
+- アプリを再度[コンパイル](https://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB)しなくても通信デプロイ設定を変えれるような独立性を提供する
+
+- SOMEIPから[通信プロトコル](https://d.hatena.ne.jp/keyword/%C4%CC%BF%AE%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)を変更するときや、イベントのSubscribeの[TTL](https://d.hatena.ne.jp/keyword/TTL)を変えたいときや、[後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性のあるバージョン変更、ポート番号などServiceInstanceToMachineMapping の属性値の変更
+
+###### SWS_CM_10590
+
+- ProvidedApServiceInstance および RequiredApServiceInstanceにおいて、::等の抽象的なネットワーク[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)を可能とすること
+
+- あまり読み取れなかった。ポート番号12345のportnameをtestportにすることで、testnameのポート番号を変更しても[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)されていたインターフェースに影響を与えない的な？
+
+###### SWS_CM_10416
+
+- 受信したメッセージを形式不正（malformed）と判断した場合は破棄し、エラーはアプリケーションに通知されてはならない
+
+##### 7.8.1 SOME/IP Network binding
+
+- SOME/IP Eventはunicastとmulticastに対応
+
+- イベント配信にユニキャスを使う場合、**multi-cast-threshold に達したら[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)にするような設定が可能**
+
+###### [SWS_CM_10000] SOME/IP Compliance
+
+- SOME/IPネットワーク[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)は、別仕様書で定義されたSOME/IP[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)およびSOME/IPサービスディスカバリ[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)を実装する必要がある
+
+###### [SWS_CM_10013] Header Byte order
+
+- 全てのヘッダーはビッグエディアンで[エンコード](https://d.hatena.ne.jp/keyword/%A5%A8%A5%F3%A5%B3%A1%BC%A5%C9)される必要がある
+
+###### [SWS_CM_10172] Payload Byte order definition
+
+- バイトオーダーは ApSomeipTransformation-Propsで変更可能
+
+###### [SWS_CM_10240]DRAFT Session handling state
+
+- ApSomeipTransformationProps.sessionHandling が存在、sessionHandlingActiveの場合はセッション処理がアクティブになる
+
+- SessionIDにより整合性管理されるようになる
+
+##### 7.8.1.1 Service Discovery
+
+###### [SWS_CM_00201] Start of service discovery protocol on Server side
+
+- SOME/IPにバインドされたOffer Serviceが新しく登録された場合は、SOME/IP-SDの初期待機フェーズが開始される
+
+- サーバ側のSDのフェーズについてはProvidedSomeipServiceInstanceで決定
+
+- 初期待機フェーズ（Initial Wait Phase）
+
+- 再送待機フェーズ（Repetition Wait Phase）
+
+- メインフェーズ（Main Phase）
+
+- これらのタイミングに関するパラメータは InitialSdDelayConfig と RequestResponseDelayで決定される
+
+###### [SWS_CM_00209] Start of service discovery protocol on Client side
+
+- サーバーと同様なことがクライアントにも書かれている
+
+- サーバ側のSDのフェーズについてはProvidedSomeipServiceInstanceで決定
+
+- 初期待機フェーズ（Initial Wait Phase）
+
+- 再送待機フェーズ（Repetition Wait Phase）
+
+###### [SWS_CM_00202] SOME/IP FindService message
+
+- Findメッセージのエントリについて：
+
+- ServiceID：サービスを一意に識別
+
+- InstanceID：[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を識別。 requiredServiceInstanceIdをAll（0xffff）とした場合は全ての[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)IDを対象とする
+
+- MajorVersion：メジャーバージョンは一致しないと互換性がないと判断される
+
+- minorVersion：requiredMinorVersionに設定
+
+- versionDrivenFindBehavior が minimumMinorVersionに設定されている場合は、minorVersionは0xffffffffに設定され、requiredMinorVersion以上のバージョンとしかSDが成立しなくなる
+
+- これは初耳だった
+
+- versionDrivenFindBehavior が exactOrAnyMinorVersion に設定されている場合は、minorVersionはrequiredMinorVersionに指定のものに。requiredMinorVersionがAllの場合は0xffff ffffにセット
+
+- [TTL](https://d.hatena.ne.jp/keyword/TTL)： serviceFindTimeToLiveに設定。クライアントが送ったFindがサーバ側にどれくらい記憶されるか決まる
+
+###### [SWS_CM_10202] Version blacklist
+
+- blacklistに記載するとSDの対象外に
+
+###### [SWS_CM_00203] SOME/IP OfferService message
+
+- Offerメッセージのエントリについて：
+
+- ServiceID：サービスを一意に識別
+
+- InstanceID：[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を識別。
+
+- MajorVersion：serviceInterfaceVersionで定義
+
+- minorVersion：serviceInterfaceVersionで定義
+
+- [TTL](https://d.hatena.ne.jp/keyword/TTL)： serviceOfferTimeToLiveに設定
+
+- EndPointOption（IPv４、[IPv6](https://d.hatena.ne.jp/keyword/IPv6)）
+
+- [トランスポート層](https://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B9%A5%DD%A1%BC%A5%C8%C1%D8)の[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)
+
+- ポート番号が０に設定されている場合は動的に割り当てられたポートを使用する
+
+- これでいいじゃんと思ったけどFWに引っかかるんだろうなあ
+
+###### [SWS_CM_00204] SOME/IP StopOffer message
+
+- Offerメッセージのエントリについて：
+
+- ほとんどOfferメッセージと同じものを設定する
+
+- [TTL](https://d.hatena.ne.jp/keyword/TTL)は0x000000に設定する
+
+- 通常のOfferメッセージとの識別には[TTL](https://d.hatena.ne.jp/keyword/TTL)を見る。[WireShark](https://d.hatena.ne.jp/keyword/WireShark)は賢いので勝手に識別してくれた気もするが
+
+###### [SWS_CM_10377] Sending SOME/IP SubscribeEventgroup messages
+
+- Service ProxyクラスのSubscribe()メソッドを叩くと、アクティブな購読が存在しない場合にSubscribeEventgroup メッセージが飛ぶ
+
+- アクティブな購読が存在しない場合というのは、初回の場合や、Subscribe ACKの[TTL](https://d.hatena.ne.jp/keyword/TTL)が切れた場合
+
+- 購買状態がアクティブの場合はSubscribeEventgroup メッセージを送信してはいけない
+
+###### [SWS_CM_10381] Sending SOME/IP SubscribeEventgroup messages - renewal
+
+- Subscribeの[TTL](https://d.hatena.ne.jp/keyword/TTL)が失効する前に購買状態を更新する場合は、再度Subscribeメッセージを送信する
+
+###### [SWS_CM_00205] Content of SOME/IP SubscribeEventgroup message
+
+- SubscribeEventgroup メッセージのエントリについて：
+
+- ほとんどOfferメッセージと同じものを設定する
+
+- EventGroupID：Manifestに記載のものを使用
+
+- [TTL](https://d.hatena.ne.jp/keyword/TTL)：ManifestのsdClientEventGroupTimingConfigで定義
+
+- [IPv4](https://d.hatena.ne.jp/keyword/IPv4) or [IPv6](https://d.hatena.ne.jp/keyword/IPv6) Endpoint Option：クライアントがイベントを受け取るIP情報を記載
+
+- イベントを受信するトランスポート[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)
+
+###### [SWS_CM_00206] SOME/IP SubscribeEventgroupAck message
+
+- SubscribeをACKする場合に送信
+
+- SubscribeEventgroupACK メッセージのエントリについて：
+
+- ほとんどSubscribeEventGroupメッセージと同じものを設定する
+
+- [TTL](https://d.hatena.ne.jp/keyword/TTL)：サーバの[TTL](https://d.hatena.ne.jp/keyword/TTL)＜クライアントの[TTL](https://d.hatena.ne.jp/keyword/TTL)の場合はサーバの[TTL](https://d.hatena.ne.jp/keyword/TTL)に制限される
+
+- [IPv4](https://d.hatena.ne.jp/keyword/IPv4) or [IPv6](https://d.hatena.ne.jp/keyword/IPv6) Multicast Option：（購読数が[閾値](https://d.hatena.ne.jp/keyword/%EF%E7%C3%CD)に達した場合にMulticast通信に切り替える）multicastThresholdに達した場合、MulticastIPを通知する
+
+- イベントを送信するトランスポート[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)（Multicastを使用する場合は[UDP](https://d.hatena.ne.jp/keyword/UDP)）
+
+- Multicastをする場合は、IGMPメッセージの送信があってから送られるのだろうか、、、そしたら[スループット](https://d.hatena.ne.jp/keyword/%A5%B9%A5%EB%A1%BC%A5%D7%A5%C3%A5%C8)大きそう
+
+###### [SWS_CM_00208] SOME/IP SubscribeEventgroupNack message
+
+- SubscribeをNACKする場合に送信
+
+- SubscribeEventgroupACK メッセージのエントリと同様だが、[TTL](https://d.hatena.ne.jp/keyword/TTL)は0x000000に設定
+
+###### [SWS_CM_10378] Sending SOME/IP StopSubscribeEventgroup messages
+
+- アクティブな購読が残っている場合は、StopSubscribeEventgroupメッセージを送ってはいけない
+
+- アクティブな購読がなくなったら送信してOK
+
+###### [SWS_CM_00207] Content of SOME/IP StopSubscribeEventgroup message
+
+- これもSubscribeEventgroupメッセージの[TTL](https://d.hatena.ne.jp/keyword/TTL)を０にする
+
+##### 7.8.1.2 Accumulation of SOME/IP messages
+
+###### [SWS_CM_10387] Data accumulation for UDP data transmission
+
+- 1つの[UDP](https://d.hatena.ne.jp/keyword/UDP)データグラムにSOME/IPのイベントやメソッドを蓄積する機能をサポートする
+
+###### [SWS_CM_10388] Enabling of data accumulation for UDP data transmission
+
+-
+
+SomeipServiceInstanceToMachineMapping.udpCollectionBufferSizeThresholdに値が設定されている場合、データアキュムレーションをサポートする
+
+###### [SWS_CM_10389] Configuration of a data accumulation on a ProvidedSomeipServiceInstance for transmission over UDP / [SWS_CM_10390] Configuration of a data accumulation on a Required- SomeipServiceInstance for transmission over UDP
+
+- アキュムレートされたメッセージは送信トリガが発生するまでバッファに蓄積される
+
+- この後トリガについて記載されている
+
+##### 7.8.1.3 Execution context of message reception actions
+
+- この節以降では、「受信時（upon reception）」という用語を、以下のような意味で使用：
+
+- SOME/IPメッセージを受信してから、該当[API](https://d.hatena.ne.jp/keyword/API)（例：Event::GetNewSamples()）が呼び出されるまでのどこかのタイミングで、[ペイロード](https://d.hatena.ne.jp/keyword/%A5%DA%A5%A4%A5%ED%A1%BC%A5%C9)のデ[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)といった処理が非同期に行われる可能性があるということ
+
+###### [SWS_CM_11270]DRAFTSelecting elements of the ServiceInterface for SecOC transmission
+
+- SecOCによって保護されるエッセージを選択的に決定できる
+
+##### 7.8.1.4 Handling Events
+
+###### [SWS_CM_10287] Conditions for sending of a SOME/IP event message
+
+- EventクラスのSend()メソッドによってEventが送信されるが、これはアクティブな購買者が1人でも存在する場合のみである
+
+- アクティブな購買者がいないときは送らない
+
+###### [SWS_CM_10288] Transport protocol for sending of a SOME/IP event message
+
+- [閾値](https://d.hatena.ne.jp/keyword/%EF%E7%C3%CD)に達する前は、SomeipServiceInterfaceDeployment.eventDeployment.trans
+
+portProtocolに記載のトランスポート[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)を使用してイベントメッセージを送信
+
+-
+
+multicastThresholdに達した場合は、multicstになるので[UDP](https://d.hatena.ne.jp/keyword/UDP)となる
+
+###### [SWS_CM_10289] Source of a SOME/IP event message
+
+- Eventメッセージの送信元アドレスとしてOfferServiceのEndpointOptionで設定したIPおよびポートを使用する
+
+###### [SWS_CM_10290] Destination of a SOME/IP event message
+
+- multicastThresholdに達した場合は、SubscribeEventgroupAckメッセージに含まれるMulticstIPおよびポートを[送信先](https://d.hatena.ne.jp/keyword/%C1%F7%BF%AE%C0%E8)に使用する
+
+- [閾値](https://d.hatena.ne.jp/keyword/%EF%E7%C3%CD)に達していない場合は、SubscribeEventgroup メッセージに含まれるIPおよびポートに送信する
+
+###### [SWS_CM_10291] Content of the SOME/IP event message
+
+- Eventメッセージの内容：
+
+- ServiceID
+
+- Event
+
+- Length：paylod＋８となる
+
+- ClientID：Eventメッセージでは使用しないため、0x0000に設定
+
+- SessionID：Session管理されない場合は、0x0000に。される場合はEvent送信ごとにインクリメント
+
+- Protocol Version
+
+- Interface Version
+
+- Message Type：Eventでは0x02
+
+- ReturnCode：使用されないため0x00
+
+- Payload
+
+###### [SWS_CM_10293] Identifying the right event
+
+- ServiceIDとEventIDによって正しいEventか識別
+
+###### [SWS_CM_10379] Silently discarding SOME/IP event messages for unsub- scribed events
+
+- クライアントがアクティブなサブスクライブをしていない場合はメッセージを静かに破棄
+
+###### [SWS_CM_10296] Invoke receive handler
+
+- クライアントのEventクラスのSetReceiveHandler()メソッドによて受信ハンドラが登録された場合、Event受信時に呼びだされる
+
+###### [SWS_CM_10294] Deserializing the payload
+
+- [SWS_CM_10293] によって特定されたEventに対してで知りアライズされる
+
+###### [SWS_CM_10295] Providing the received event data
+
+- デ[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)されたEventは、アプリのEventクラスのGetNewSamples()メソッドを使用してデータにアクセスする
+
+- ハンドラを使用した場合、ハンドラ内にGetNewSamples()を実装していた場合は、Event受信時にデータを取得しにいく
+
+- 一方、GetNewSamples()を周期的に使ってポーリングすることもできる
+
+###### [SWS_CM_10360]DRAFTFailures in sending a SOME/IP event message
+
+- Event送信に失敗した場合はSend()メソッドの返り値にnetworkbinding errorが返される
+
+##### 7.8.1.5 Handling Triggers
+
+- SOMEIPのEventメッセージの特殊版としてTriggerというものがある
+
+- Payload省略可能で、クライアントのアクションをトリガーするためのものらしい
+
+##### 7.8.1.6 Handling Method Calls
+
+- Eventと似たようなことが書いてある...

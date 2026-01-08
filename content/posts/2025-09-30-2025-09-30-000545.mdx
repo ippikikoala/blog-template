@@ -1,0 +1,548 @@
+---
+title: "【vsomeip】ラズパイ同士でSOMEIP通信をさせる"
+date: "2025-09-30"
+description: "- vsomeipによるラズパイ同士のSOMEIP通信(vsomeipによるラズパイ同士のSOMEIP通信) - 環境(環境) - 失敗した例(失敗した例) - ラズパイ2台でvsomeip通信させる手順(ラズパイ2台でvsomeip通信させる手順) - SOMEIP通信（UDP）を使用(SOMEI..."
+category: "IT"
+tags: []
+image: ""
+---
+
+- [vsomeipによるラズパイ同士のSOMEIP通信](#vsomeipによるラズパイ同士のSOMEIP通信)
+
+            - [環境](#環境)
+
+            - [失敗した例](#失敗した例)
+
+            - [ラズパイ2台でvsomeip通信させる手順](#ラズパイ2台でvsomeip通信させる手順)
+
+            - [SOMEIP通信（UDP）を使用](#SOMEIP通信UDPを使用)
+
+
+
+
+    - [SOMEIP通信のシーケンス（パケット）の説明](#SOMEIP通信のシーケンスパケットの説明)
+
+AUTOSARの悪口を見ていたら、vsomeipを使ってSOMEIP通信することができると書いてあったので試してみました（かなり生々の内容で体裁が非常に汚いのはご勘弁を）。
+
+[https://www.reddit.com/r/embedded/comments/leq366/comment/gmiq6d0/](https://www.reddit.com/r/embedded/comments/leq366/comment/gmiq6d0/)
+
+#### SOMEIP通信とは
+
+車載ソフトの規格団体であるAUTOSARによって策定された[通信プロトコル](https://d.hatena.ne.jp/keyword/%C4%CC%BF%AE%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)。[SOA](https://d.hatena.ne.jp/keyword/SOA)（Service Orientied Archtecture）の思想のもとに策定されている。
+
+[Vector](https://d.hatena.ne.jp/keyword/Vector)の説明資料が一番わかり易いです：
+
+[https://www.vector.com/jp/ja/know-how/vj-beginners/someip/](https://www.vector.com/jp/ja/know-how/vj-beginners/someip/)
+
+ここからは自分の感想になりますが、[SOA](https://d.hatena.ne.jp/keyword/SOA)というだけあり、システムを「Service」の集合体として扱うのが特徴です。
+
+##### SOA
+
+例えば、ECU1とECU2の通信を考えます。
+
+- ECU1にはカメラと温度センサがありこれらを制御するアプリ（カメラアプリ、温度センサアプリ）がある
+
+- ECU2には複数のアプリがあり、カメラと温度の情報を使用する
+
+とします。
+
+このときカメラアプリはカメラ画像を提供するためのIFの集合体を、温度アプリは温度を提供するためのIFの集合体を提供します。これらはそれぞれServiceと呼ばれます。Serviceを提供するアプリは他の[ECU](https://d.hatena.ne.jp/keyword/ECU)にOfferしてServiceをどこで（EndPoint情報）提供しているかを知らせます。
+
+一方でECU2のアプリは、必要なServiceをFindします。Offerが届いたらEndPointに対して通信を確立します。
+
+ここで[SOA](https://d.hatena.ne.jp/keyword/SOA)の特徴として挙げられるのは、
+
+- アプリは、Service単位でIFを持ち、複数のServiceを提供することができる
+
+- 反対に、アプリは必要なServiceを発見しIFにアクセスすることができる
+
+- Serviceを提供するアプリは、誰が自分の情報を取得しているかに興味をもたない（セキュリティ的に制限することもできる）
+
+- [疎結合](https://d.hatena.ne.jp/keyword/%C1%C2%B7%EB%B9%E7)なのでServiceの追加・削除が容易
+
+SOMEIP通信には大きく以下の通信方式があります：
+
+- Method Request & Response
+
+-  クライアントからのRequestに対してサーバがResponseを送信する
+
+- 例）クライアントから画像提供要求・サーバから応答
+
+- Method Fire & Forget
+
+-  クライアントから一方的に通信を投げつける
+
+- 例）クラインアントの状態を定期的にサーバに伝える
+
+- Event
+
+-  サーバから一方的に通信を投げつける
+
+- 例）定期的に温度情報を送信する
+
+クライアントはEventを受信するには、Subscribeというパケットを送信必要があります。購読という言葉通りで、自分はこのEventを購読します！と宣言します。サーバは妥当性を検討してSubscribeに対しACKまたはNACKを返します。
+
+SOMEIPにおいてServiceやIFを識別するために各種IDが使用されます
+
+- ServiceID
+
+- Serviceを一位に識別するID（カメラサービス・温度サービス）
+
+- InstanceID
+
+-  ServiceのInstance（実体）を識別するためのID
+
+- ServiceにはMajor VersionとMinor Versionがあり、Major Versionを変更した際はInstanceを分けることが推奨されている
+
+- Method ID
+
+- 提供するMethodを識別するためのID
+
+- EventGroup・EventID
+
+- 提供するEventGroup・Eventを識別するためのID
+
+##### SOMEIP通信のシーケンス
+
+ここに詳しく書かれていますが、、、[ARP](https://d.hatena.ne.jp/keyword/ARP)解決等はされている前提とします。
+
+ざっくりした順序はSOMEIP-SD(Service Discovety)→SOMEIP通信となります。SOMEIP通信はL4（[トランスポート層](https://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B9%A5%DD%A1%BC%A5%C8%C1%D8)）に[UDP](https://d.hatena.ne.jp/keyword/UDP)及び[TCP](https://d.hatena.ne.jp/keyword/TCP)を使用することができますが、今回は[TCP](https://d.hatena.ne.jp/keyword/TCP)を使う場合を考えます（Service Discoveryは[UDP](https://d.hatena.ne.jp/keyword/UDP)で実施されます）
+
+- 【クライアント・サーバ】IGMP[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)によって[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)IPにJoinする
+
+- 【クライアント】Find Serviceを送信する（ServiceID, InstanceID）
+
+- 【サーバ】Offer Seviceを送信する（ServiceID, InstanceID, EndPoint情報を含む）
+
+- 【クライアント・サーバ】[TCP](https://d.hatena.ne.jp/keyword/TCP)の3ウェイハンドシェイクを実施
+
+- 【クライアント】Subscribeを送信
+
+- 【サーバ】Subscribe ACK/NACKを送信
+
+- 【サーバ・クライアント】SOMEIP通信を実施
+
+#### vsomeipによるラズパイ同士のSOMEIP通信
+
+COVESAは神
+
+コネクテッド[ビークル](https://d.hatena.ne.jp/keyword/%A5%D3%A1%BC%A5%AF%A5%EB)システムズアライアンス（COVESA）は、以前はGENIVIアライアンスとして知られており、コネクテッド[ビークル](https://d.hatena.ne.jp/keyword/%A5%D3%A1%BC%A5%AF%A5%EB)に搭載されている[オペレーティングシステム](https://d.hatena.ne.jp/keyword/%A5%AA%A5%DA%A5%EC%A1%BC%A5%C6%A5%A3%A5%F3%A5%B0%A5%B7%A5%B9%A5%C6%A5%E0)と[ミドルウェア](https://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2)、および関連する[クラウド](https://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9)サービスを統合するためのリファレンスアプローチを開発する非営利の自動車業界アライアンスです。
+
+##### 環境
+
+使用した機材
+
+- [Raspberry Pi](https://d.hatena.ne.jp/keyword/Raspberry%20Pi) 4 Model B/4GB（ラズパイ4B） 2台
+
+- [Raspberry Pi](https://d.hatena.ne.jp/keyword/Raspberry%20Pi) OSをインストール
+
+- Dockerを使えば２台用意しなくていいらしい
+
+- M2 [Macbook Air](https://d.hatena.ne.jp/keyword/Macbook%20Air)
+
+##### 失敗した例
+
+ラズパイでSOMEIP通信と書いたけど、色々（本質的でないことで）試行錯誤しました。ここではうまく行かなかったことを記載します。
+
+### ラズパイ4BとUTM上の[Ubuntu](https://d.hatena.ne.jp/keyword/Ubuntu)でのSOMEIP通信**
+
+ラズパイ4Bは1台しか持っていなかったので、最初はラズパイと[Macbook](https://d.hatena.ne.jp/keyword/Macbook)上の[VM](https://d.hatena.ne.jp/keyword/VM)でSOMEIP通信させようとしていました（今思うと[Ubuntu](https://d.hatena.ne.jp/keyword/Ubuntu)ではなく[Mac](https://d.hatena.ne.jp/keyword/Mac)で動かせばよかったかも）。フィアウォールを突破できず失敗
+
+### ラズパイ4BとラズパイZero-WのSOMEIP通信**
+
+ラズパイZero-Wではスペック的にvsomeipのビルド環境が作れませんでした。ク[ロスコン](https://d.hatena.ne.jp/keyword/%A5%ED%A5%B9%A5%B3%A5%F3)パイルも試したのですがうまく行かず断念
+
+##### ラズパイ2台でvsomeip通信させる手順
+
+手元に[SSH](https://d.hatena.ne.jp/keyword/SSH)できるラズパイがあるものとします。手順はほぼここに書いてあります。
+
+必須のパッケージをインストールする
+
+```
+$ sudo apt install -y build-essential cmake git libboost-all-dev
+```
+
+gitからvsomeipのソースをクローンする
+
+```
+$ git clone https://github.com/COVESA/vsomeip.git
+$ cd vsomeip
+```
+
+ここからは上記リンク「準備/前提条件」からの手順通りの操作になるので省略。
+
+例にはサンプルコードも含まれており、同じ端末の別ターミナルでサーバとクライアントを立ち上げると通信ができます。
+
+注意点としてここでの通信はプロセス間通信であること。パケットのキャプチャをすることはできません（なので厳密にSOMEIP通信というのは微妙かも。AUTOSARのara::comがするようなSOMEIP通信に準拠したIPC通信となりそう）。
+
+通信をお外に出すためにはさらに操作が必要になります。
+
+##### SOMEIP通信（UDP）を使用
+
+お外との通信では使用するネットワークインターフェースやIPを定義した[JSON](https://d.hatena.ne.jp/keyword/JSON)を置く必要があります。ここではSOMEIP通信にUnreliable=[UDP](https://d.hatena.ne.jp/keyword/UDP)通信を使用することにしています。
+
+サーバとなるラズパイに以下のservice.[json](https://d.hatena.ne.jp/keyword/json)を置きます：
+
+```
+{
+    "unicast" : "192.168.11.29",
+    "network" : "wlan0",
+    "logging" :
+    {
+        "level" : "debug",
+        "console" : "true",
+        "file" : { "enable" : "false", "path" : "/tmp/vsomeip.log" },
+        "dlt" : "false"
+    },
+    "applications" :
+    [
+        {
+            "name" : "World",
+            "id" : "0x1212"
+        }
+    ],
+    "services" :
+    [
+        {
+            "service" : "0x100a",
+            "instance" : "0x0001",
+            "unreliable": "30509",
+            "event-groups": [
+                { "event-group": "0x8001",
+                "events": ["0x8001"]}
+              ]
+        },
+        {
+            "service" : "0x100a",
+            "instance" : "0x0001",
+            "reliable": "30508"
+        }
+    ],
+    "routing" : "World",
+    "service-discovery" :
+    {
+        "enable" : "true",
+        "multicast" : "224.244.224.245",
+        "port" : "30490",
+        "protocol" : "udp",
+        "initial_delay_min" : "0",
+        "initial_delay_max" : "10",
+        "repetitions_base_delay" : "200",
+        "repetitions_max" : "3",
+        "ttl" : "3",
+        "cyclic_offer_delay" : "2000",
+        "request_response_delay" : "1500"
+    }
+}
+```
+
+クライアントとなるラズパイにはclient.[json](https://d.hatena.ne.jp/keyword/json)を置きます
+
+```
+{
+    "unicast" : "192.168.11.33",
+    "network" : "wlan0",
+    "logging" :
+    {
+        "level" : "debug",
+        "console" : "true",
+        "file" : { "enable" : "false", "path" : "/var/log/vsomeip.log" },
+        "dlt" : "false"
+    },
+    "applications" :
+    [
+        {
+            "name" : "Hello",
+            "id" : "0x1313"
+        }
+    ],
+    "routing" : "Hello",
+    "service-discovery" :
+    {
+        "enable" : "true",
+        "multicast" : "224.244.224.245",
+        "port" : "30490",
+        "protocol" : "udp",
+        "initial_delay_min" : "10",
+        "initial_delay_max" : "100",
+        "repetitions_base_delay" : "200",
+        "repetitions_max" : "3",
+        "ttl" : "3",
+        "cyclic_offer_delay" : "2000",
+        "request_response_delay" : "1500"
+    }
+}
+```
+
+~/.basrcに以下を仕込んで設定を恒久化させます（サーバ側）
+
+```
+export LD_LIBRARY_PATH=$HOME/work/vsomeip/build:$LD_LIBRARY_PATH
+export VSOMEIP_CONFIGURATION=$HOME/work/vsomeip/test_example/service.json
+export VSOMEIP_APPLICATION_NAME=World
+```
+
+※ source ~/.bashrcを忘れずに
+
+次が詰まりポイントだと思うのですが、ラズパイのルーティングテーブルに[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)IPを追加します。これを忘れると[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)IP宛のパケットが出ません。
+
+```
+$ sudo ip route add 224.244.224.0/24 dev eth0
+```
+
+サーバ側の[ソースコード](https://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9)は以下のようにしました。サーバ側は3秒ごとにEventを送信させています。また、MethodのResponseに対しRequestを返すようにしています。
+
+```
+#include
+#include
+#include
+#include
+#include
+
+#include
+#include
+
+#define SAMPLE_SERVICE_ID 0x100a
+#define SAMPLE_INSTANCE_ID 0x0001
+#define SAMPLE_METHOD_ID 0x0005
+#define SAMPLE_METHOD_ID_FF 0x0006
+#define SAMPLE_EVENTGROUP_ID 0x8001
+#define SAMPLE_EVENT_ID 0x8001
+
+using namespace vsomeip_v3::logger;
+
+std::shared_ptr app;
+std::shared_ptr payload;
+std::atomic running{true};
+
+// Method 受信時
+void on_message(const std::shared_ptr &_request) {
+
+    std::cout  req_payload = _request->get_payload();
+    if (req_payload) {
+        const vsomeip::byte_t* data = req_payload->get_data();
+        std::size_t length = req_payload->get_length();
+        std::string json_str(reinterpret_cast(data), length);
+        std::cout  its_response =
+        vsomeip::runtime::get()->create_response(_request);
+    std::shared_ptr resp_payload =
+        vsomeip::runtime::get()->create_payload();
+    std::string text = "This is the server.";
+    std::vector its_payload_data(text.begin(), text.end());
+    resp_payload->set_data(its_payload_data);
+    its_response->set_payload(resp_payload);
+    app->send(its_response);
+}
+
+// Method Fire & Foreget 受信時に呼び出し
+void on_message_ff(const std::shared_ptr &_request) {
+    std::cout  its_payload = _request->get_payload();
+    if (its_payload) {
+        const vsomeip::byte_t* data = its_payload->get_data();
+        std::size_t length = its_payload->get_length();
+        // string に変換
+        std::string json_str(reinterpret_cast(data), length);
+        std::cout (c) };
+        payload = vsomeip::runtime::get()->create_payload();
+        payload->set_data(its_data, sizeof(its_data));
+        app->notify(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID, payload);
+        std::cout  its_groups;
+   its_groups.insert(SAMPLE_EVENTGROUP_ID);
+
+   app = vsomeip::runtime::get()->create_application("World");
+   if (!app->init()) {
+        message(level_e::LL_INFO) register_message_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_METHOD_ID, on_message);
+   app->register_message_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_METHOD_ID_FF, on_message_ff);
+   app->offer_event(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID, its_groups);
+   app->offer_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+   std::cout start();
+   return 0;
+}
+```
+
+クライアント側の[ソースコード](https://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9)です。key a押下でMethodのRequestを、b押下でMethod のFire & Forgetが飛びます。
+
+```
+#include
+#include
+#include
+#include
+#include
+#include
+
+#include
+
+// 各ID
+#define SAMPLE_SERVICE_ID 0x100a
+#define SAMPLE_INSTANCE_ID 0x0001
+#define SAMPLE_METHOD_ID 0x0005
+#define SAMPLE_METHOD_ID_FF 0x0006
+#define SAMPLE_EVENTGROUP_ID 0x8001
+#define SAMPLE_EVENT_ID 0x8001
+
+std::shared_ptr app;
+std::mutex mutex;
+std::condition_variable condition;
+std::atomic running{true}; // Ctrl+Cで終了
+
+// Method Request送信
+void send_request() {
+    std::shared_ptr request = vsomeip::runtime::get()->create_request();
+    request->set_service(SAMPLE_SERVICE_ID);
+    request->set_instance(SAMPLE_INSTANCE_ID);
+    request->set_method(SAMPLE_METHOD_ID);
+
+    // ペイロード作成
+    std::string text = "Who are you?";
+    std::shared_ptr its_payload = vsomeip::runtime::get()->create_payload();
+    std::vector its_payload_data(text.begin(), text.end());
+    its_payload->set_data(its_payload_data);
+    request->set_payload(its_payload);
+    std::cout send(request);
+}
+
+// Fire & Forget 送信
+void send_fire_and_forget() {
+    std::shared_ptr fireforget = vsomeip::runtime::get()->create_request();
+    fireforget->set_service(SAMPLE_SERVICE_ID);
+    fireforget->set_instance(SAMPLE_INSTANCE_ID);
+    fireforget->set_method(SAMPLE_METHOD_ID_FF);
+    fireforget->set_message_type(vsomeip::message_type_e::MT_REQUEST_NO_RETURN);
+    std::shared_ptr its_payload = vsomeip::runtime::get()->create_payload();
+    std::string text = "Hello!";
+    std::vector its_payload_data(text.begin(), text.end());
+    its_payload->set_data(its_payload_data);
+    fireforget->set_payload(its_payload);
+    std::cout send(fireforget);
+}
+
+// Method Response受信時
+void on_message(const std::shared_ptr &_response) {
+    std::shared_ptr its_payload = _response->get_payload();
+    if (its_payload) {
+        const vsomeip::byte_t* data = its_payload->get_data();
+        std::size_t length = its_payload->get_length();
+        // string に変換
+        std::string json_str(reinterpret_cast(data), length);
+        std::cout  &_response) {
+   std::cout  its_groups;
+        its_groups.insert(SAMPLE_EVENTGROUP_ID);
+
+        // Subscribe開始
+        app->request_event(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID, its_groups);
+        app->subscribe(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENTGROUP_ID);
+        std::cout register_message_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_METHOD_ID, on_message);
+    app->register_message_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, SAMPLE_EVENT_ID, on_message_event);
+}
+
+
+// キーボード入力監視スレッド
+// key aでリクエスト・bでFire&Forget送信
+void input_thread() {
+    char key;
+    while (running) {
+        std::cin.get(key);
+        if (key == 'a') {
+            send_request();
+        } else if (key == 'b') {
+            send_fire_and_forget();
+        }
+    }
+}
+
+int main() {
+    app = vsomeip::runtime::get()->create_application("Hello");
+    app->init();
+    app->register_availability_handler(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID, on_availability);
+    app->request_service(SAMPLE_SERVICE_ID, SAMPLE_INSTANCE_ID);
+
+    // キーボード入力スレッド開始
+    std::thread input_worker(input_thread);
+    input_worker.detach();
+    app->start(); // vsomeip メインループ開始
+    running = false;
+}
+
+```
+
+#### SOMEIP通信のシーケンス（パケット）の説明
+
+実際に[tcpdump](https://d.hatena.ne.jp/keyword/tcpdump)で取得したパケットを[WireShark](https://d.hatena.ne.jp/keyword/WireShark)で見ていきましょう！
+
+- IGMPv3[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)で[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)IPにJoinします
+
+```
+377    14.661597    192.168.11.29    224.0.0.22    IGMPv3    54    Membership Report / Join group 224.244.224.245 for any sources
+```
+
+- ClientはFindパケットでServiceを探していることを通知します（クライントは先にOfferを受信するとFindを送信しません）
+
+```
+271    9.187558    192.168.11.33    224.244.224.245    SOME/IP-SD    86    SOME/IP Service Discovery Protocol [Find]            ?
+```
+
+- SOMEIP-SD[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)のEntriesArrrayには探しているServiceのIDとInstanceIDが含まれます
+
+```
+Find Service Entry (Service ID 0x100a, Instance ID 0x0001, Version ANY.ANY, Options: None)
+```
+
+- ServerはOfferパケットでService提供を通知します
+
+```
+354    14.508403    192.168.11.29    224.244.224.245    SOME/IP-SD    98    SOME/IP Service Discovery Protocol [Offer]
+```
+
+- SOMEIP-SD[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)のEntriesArrayには提供しているServiceのIDとInstanceIDが含まれ、
+
+```
+Offer Service Entry (Service ID 0x100a, Instance ID 0x0001, Version 0.0, Options: 0-0)
+```
+
+- SOMEIP-SD[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)のOptinsArratにはEndPoint情報が含まれます
+
+```
+0: IPv4 Endpoint Option (192.168.11.29:30509 (UDP))
+```
+
+- ClinetはSubscribeを送信します
+
+```
+357    14.518243    192.168.11.33    192.168.11.29    SOME/IP-SD    98    SOME/IP Service Discovery Protocol [Subscribe]
+```
+
+- ServerはSubscribeACKを送信します
+
+```
+358    14.518566    192.168.11.29    192.168.11.33    SOME/IP-SD    86    SOME/IP Service Discovery Protocol [SubscribeAck]
+```
+
+- ServerからのEvent送信が始まります
+
+```
+408    17.509306    192.168.11.29    192.168.11.33    SOME/IP    59    SOME/IP Protocol (Service ID: 0x100a, Method ID: 0x8001, Length: 9)
+```
+
+- ClientからのMethod Requestに対し、サーバはResponseを返します
+
+```
+492    22.949609    192.168.11.33    192.168.11.29    SOME/IP    70    SOME/IP Protocol (Service ID: 0x100a, Method ID: 0x0005, Length: 20)
+493    22.954979    192.168.11.29    192.168.11.33    SOME/IP    77    SOME/IP Protocol (Service ID: 0x100a, Method ID: 0x0005, Length: 27)
+```
+
+- クライアント側のコンソールの表示はこんな感じ
+
+```
+CLIENT: Received Event Message!!
+a
+[CLIENT] Sending Request (method call)
+CLIENT: Method Response Payload = This is the server.
+CLIENT: Received Method Response from Server
+CLIENT: Received Event Message!!
+b
+[CLIENT] Sending Fire&Forget
+```
+
+
+
+この後[TCP](https://d.hatena.ne.jp/keyword/TCP)通信をさせた様子を追記予定。また、[C++](https://d.hatena.ne.jp/keyword/C%2B%2B)の学習にもなったのでコードの解説も書きたい

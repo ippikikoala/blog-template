@@ -1,0 +1,223 @@
+---
+title: "【AUTOSAR】Specification of Communication Management（R21-11）を読んでみる（7.1章）"
+date: "2025-05-10"
+description: "7 Functional specification(7-Functional-specification) - 7.1 General description(71-General-description) - 7.1.2 Design decisions(712-Design-decisions..."
+category: "IT"
+tags: []
+image: ""
+---
+
+[7 Functional specification](#7-Functional-specification)
+
+            - [7.1 General description](#71-General-description)
+
+            - [7.1.2 Design decisions](#712-Design-decisions)
+
+            - [7.1.3 Communication paradigms](#713-Communication-paradigms)
+
+            - [7.1.4 Service contract versioning](#714-Service-contract-versioning)
+
+                    - [SWS_CM_99003](#SWS_CM_99003)
+
+
+
+
+            - [7.2 Raw Data Streaming](#72-Raw-Data-Streaming)
+
+            - [7.3 Communication Group](#73-Communication-Group)
+
+
+
+
+
+[重厚長大](https://d.hatena.ne.jp/keyword/%BD%C5%B8%FC%C4%B9%C2%E7)機械メーカから転職して、A-SPICEでいうSYS工程（要求仕様作成）における
+
+車載ソフトの開発に関わるようになってから１年くらい。結合試験で色々あって簡単なパケット変換（結局失敗）をしてみてからネットワークおもしろくね？となり、この前ネスペを受けるまでになりました。
+
+SDV時代の車載アプリケーションはAUTOSARという規格に沿った[ミドルウェア](https://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2)上で動くようになっています。AUTOSARにはCommunication Managementという通信を管理する機能が定義されているため、通信を理解する上でこの仕様書は読んでみたいところ。
+
+ということで仕様書を上から読んでいってメモを書いていくことにしました。まだ１年の初心者なのでお手柔らかに。あと工程的に実装に関わっておらず、[C++](https://d.hatena.ne.jp/keyword/C%2B%2B)とかわかってません。
+
+※アンダーラインは僕の感想です
+
+#### 7 Functional specification
+
+##### 7.1 General description
+
+- Communication Management（以下CM）はAUTOSAR Adaptiveの機能[クラスタ](https://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF)ーの一つで、ara（AUTOSAR Runtime for Adaptive Applications）の一部
+
+- CMはアプリケーション間の通信経路の構築及び監視をする。アプリ間というのはローカルの場合もリモートの場合もある
+
+- IPC通信や外部Etherの場合もあるよってこと
+
+- CMの機能は以下
+
+- トランスポートプロコトルスタックとの統合と構成
+
+- ミドルウエア機能（[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)、Service Discovery（以下SD）、通信状態の管理）
+
+- [ミドルウェア](https://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2)ということでOSとアプリケーションの橋渡しをしてくれる。OSが[POSIX](https://d.hatena.ne.jp/keyword/POSIX)だったら、[POSIX](https://d.hatena.ne.jp/keyword/POSIX)の通信機能に乗せていい感じに通信してくれるのがCM
+
+- 上述した通り、通信にはover SOME/IPの外部Etherと、IPC通信があるがアプリ実装で使う[API](https://d.hatena.ne.jp/keyword/API)は同じ
+
+- [ソースコード](https://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9)に書く[API](https://d.hatena.ne.jp/keyword/API)は同じ、外部EtherでSOMEIP通信したかったら、Manifestに記載してやればいいイメージ。とにかく[疎結合](https://d.hatena.ne.jp/keyword/%C1%C2%B7%EB%B9%E7)な構成を目指しているっぽい
+
+- 図7.1
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250510192121.png)
+
+- 図を見ると、アプリがara::com [API](https://d.hatena.ne.jp/keyword/API)を叩くことで、CMが良きように通信してくれることがわかる
+
+- 注意として、[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)処理はアプリの実行コンテキスト（スレッド）で実施する
+
+- ara::comがシリライズしてくれると思っていたが、そうではない
+
+- ARA [API](https://d.hatena.ne.jp/keyword/API)の設計制約について
+
+- ara::com [API](https://d.hatena.ne.jp/keyword/API)は通信方式や言語[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)に依存しない
+
+- 外部EhterであろうがIPCでろうが、[C++](https://d.hatena.ne.jp/keyword/C%2B%2B)であっても[Python](https://d.hatena.ne.jp/keyword/Python)でも同じやということ
+
+- 動的通信をサポートする
+
+No discovery by application middleware, the clients know the server but the
+
+Server does not know the clients. Event subscription is the only dynamic
+
+communication pattern in the application.
+
+-
+
+- すごい重要なことが書いてある。クライアントはサーバを意識するがサーバはクライアントをケアしない。アプリの通信パターンとして動的なものはEvent Subscriptionのみ
+
+- アプリはService Discovery（SD）の[API](https://d.hatena.ne.jp/keyword/API)を使ってサービス[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を検索し、使用する
+
+- Manifestで静的な通信経路を記載できた気もするが、基本的にSDによって動的にクライアントがサーバを知り、サブスクライブし、通信をする
+
+- [API](https://d.hatena.ne.jp/keyword/API) は、Evebt／Callback方式とpolling方式の両方をサポートしなければならない
+
+- Event/Callback方式は、ハンドラを登録しておいて、メッセージが来たら処理関数が呼ばれる。ポーリングはアプリがメッセージ取得の関数を周期的に呼びだすイメージだが、、、こんなことする必要あるのかとは思った？まあRTEのスタイルと互換を持たせたいっぽい
+
+- 同期的なコールバックベースの通信と非同期な通信の両方に対応すること
+
+- あまり意識していなかったとは言えない...
+
+- E2E保護や通信品質についてはこの[API](https://d.hatena.ne.jp/keyword/API)の対象外
+
+##### 7.1.2 Design decisions
+
+- ara::com通信はProxyとSkeltonパターンを使用する
+
+- 自分はよくクライアントがProxy、サーバがSkeltonなんて言うけど、厳密さに欠けていた。
+
+- Proxyはクライアントアプリケーションの[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)であり、通信の中継を行う
+
+- クライアントから見た[フォワ](https://d.hatena.ne.jp/keyword/%A5%D5%A5%A9%A5%EF)ードProxy的な...？一般的なProxyと同じ意味っぽい
+
+- Skeltonは提供するサービスを[ミドルウェア](https://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2)の通信インフラに接続するための仕組み。
+
+- こっちもサーバから見たProxyみたいなもん
+
+- ara::comはデータ受信時にコールバック関数を呼び出す仕組みを実装している
+
+- Eventを受信したら勝手にハンドラを呼んでくれるのでポーリングしなくていい
+
+- zero-copy機能を持っていて、[ミドルウェア](https://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2)によるメモリマネジメントも含む
+
+- zero-copyとは...受信データをアプリケーションにコピーせず直接渡すもの。ネットワークバッファをアプリが直接参照することで、[スループット](https://d.hatena.ne.jp/keyword/%A5%B9%A5%EB%A1%BC%A5%D7%A5%C3%A5%C8)向上を図る
+
+- ara::com [API](https://d.hatena.ne.jp/keyword/API)はAUTOSARのサービスモデルと整合している
+
+- サービス、[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)、イベント、メソッド等と整合
+
+- [API](https://d.hatena.ne.jp/keyword/API)レベルでフルSDと[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)の選択をサポートしている
+
+- ara::comは[C++](https://d.hatena.ne.jp/keyword/C%2B%2B)11で導入されたstd::future, std::promiseをサポート
+
+- ara:::comは実際の通信方式を抽象化する
+
+- アプリは通信方式を意識しない
+
+- サービスのバージョン管理をサポートしている
+
+- サービスインターフェースにはMajorバージョンとMinorバージョンが存在。[後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性がない場合はMajorバージョンを上げる
+
+##### 7.1.3 Communication paradigms
+
+- AUTOSAR AdaptiveではService-Oriented Architecture([SOA](https://d.hatena.ne.jp/keyword/SOA))に基づくService-Oriented Communication (SoC)がメインの通信方式
+
+- SoCによってランタイム中に動的に通信経路を確立でき、通信相手を事前に知らなくても通信できる
+
+- サーバはサービスをOfferし、クライアントはFindする。Service Registryによって相手を発見しCallする
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250510221921.png)
+
+- Service Discovery の結果、IPC通信をするか外部Etherを使ったSOME/IP通信をするか決まる
+
+##### 7.1.4 Service contract versioning
+
+- 設計フェーズではサービスインターフェースにメジャーバージョンとマイナーバージョンを持たせる
+
+- [後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性のある（Eventの追加など）はまーなーバージョンの変更で対応。[後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性のない場合は、メジャーバージョンを変更する
+
+- メジャーバージョンの異なるIFはServiceDiscoveryが成立しない
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250510222600.png)
+
+- サービスインターフェースのバージョン管理として、設計フェーズとDeployフェーズの２段階に分けて考えている
+
+- ServiceInterfaceをServiceInterfaceDeploymentで実際の通信仕様に[マッピング](https://d.hatena.ne.jp/keyword/%A5%DE%A5%C3%A5%D4%A5%F3%A5%B0)する
+
+- なのでバージョン違いのServiceInterfaceを複数デプロイすることが可能
+
+- デプロイメントは外部通信の場合は必須。IPC通信など内部通信には必須ではない
+
+- 原則として、バージョンが分かれる時は[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)も別れたはず
+
+###### SWS_CM_99003
+
+- バージョンの互換性の判断は、Service Discoveryフェーズで行われる
+
+##### 7.2 Raw Data Streaming
+
+あまり馴染みがないのでさらっとだけ...
+
+- ara::comの[API](https://d.hatena.ne.jp/keyword/API)を利用しつつ、SOMEIPを使わずに通信したい場合に使用する
+
+- 例えば非AUTOSARとの通信に使用する
+
+- RawDataStream[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を作成すると、ソケットを生成して通信してくれる。各種設定はManifestに書くべし
+
+##### 7.3 Communication Group
+
+こちらもあまり馴染みないのでさらっと
+
+- CGは一つのサーバと複数クライアントを持つ
+
+- CGでサーバはブロードキャストと[P2P](https://d.hatena.ne.jp/keyword/P2P)通信が可能
+
+- クライアントは通知に対してACKを返せる
+
+- サーバはlistClients()→戻り値は接続しているClientIDで現在接続しているクライアントの一覧を確認できる
+
+- ユニキャストもできる
+
+- Eventと何が違うの？と思ったが
+
+- App層からサーバに対して明示的にACKを返せる（Method FFを使うこともできそうだが…）
+
+- サーバが接続されているクライアントを確認できる（Eventは送りっぱなし）
+
+- 各種通信方式として
+
+- broadcast()
+
+- message()
+
+- どちらも非同期関数（ara::core::Future）
+
+- response：クライアントからの応答を通知。ClientIDと応答メッセージが含まれる
+
+- CGの場合もClientとServerの接続はOffer, Find Serviceを使用
+
+続きはこちら

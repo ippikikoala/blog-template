@@ -1,0 +1,176 @@
+---
+title: "【AUTOSAR】Adaptive Platform Specification – Communication Management (ara::com)のメモ"
+date: "2025-04-27"
+description: "7.1 - サービスインターフェースのバージョン管理として設計フェーズとDeployフェーズの２段階に分けて考えている - 設計フェーズではサービスインターフェースにメジャーバージョンとマイナーバージョンを持たせる - 後方互換(https://d.hatena.ne.jp/keyword/%B8%..."
+category: ""
+tags: []
+image: ""
+---
+
+7.1
+
+- サービスインターフェースのバージョン管理として設計フェーズとDeployフェーズの２段階に分けて考えている
+
+- 設計フェーズではサービスインターフェースにメジャーバージョンとマイナーバージョンを持たせる
+
+- [後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性のある（Eventの追加など）はマイナーバージョンの変更で対応。[後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性のない場合は、メジャーバージョンを変更する
+
+→メジャーバージョンの異なるIFはServiceDiscoveryが成立しない
+
+
+
+- ServiceInterfaceをServiceInterfaceDeploymentで実際の通信仕様に[マッピング](https://d.hatena.ne.jp/keyword/%A5%DE%A5%C3%A5%D4%A5%F3%A5%B0)する
+
+- バージョン違いのServiceInterfaceを複数デプロイすることが可能
+
+※デプロイメントは外部通信の場合は必須。IPC通信など内部通信には必須ではない
+
+#### 7.2 Raw Data Streaming
+
+- ara::comの[API](https://d.hatena.ne.jp/keyword/API)を利用しつつ、SOMEIPを使わずに通信したい場合に使用する
+
+- 例えば非AUTOSARとの通信に使用する場合に使う
+
+- RawDataStream[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を作成すると、ソケットを生成して通信してくれる。各種設定はManifestに書くべし
+
+※あまり馴染みがないので一旦飛ばす
+
+#### 7.3 Communication Group
+
+こちらもあまり馴染みはないが…
+
+- CGは一つのサーバと複数クライアントを持つ
+
+- CGでサーバはブロードキャストと[P2P](https://d.hatena.ne.jp/keyword/P2P)通信が可能
+
+- クライアントは通知に対してACKを返せる
+
+- サーバはlistClients()を叩くことで、戻り値に接続しているClientIDで現在接続しているクライアントの一覧を得る
+
+- ユニキャストもできる
+
+Eventと何が違うの？と思ったが、
+
+- App層からサーバに対して明示的にACKを返せる（Method FFを使うこともできそうだが…）
+
+- サーバが接続されているクライアントを確認できる（Eventは送りっぱなし）
+
+
+
+- 各種通信方式として
+
+- broadcast()
+
+- message()
+
+→どちらも非同期関数（ara::core::Future）
+
+- response：クライアントからの応答を通知。ClientIDと応答メッセージが含まれる
+
+- CGの場合もClientとServerの接続はOffer, Find Serviceを使用
+
+#### 7.5 Network Binding
+
+- Network BindingとはIFをデプロイ時に使う[通信プロトコル](https://d.hatena.ne.jp/keyword/%C4%CC%BF%AE%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)に紐づけること
+
+- 設定はDeployment Manifestで実行
+
+→[API](https://d.hatena.ne.jp/keyword/API)を色々な方法でデプロイすることが可能に
+
+以下を設定できる
+
+- SOMEIPのL4の[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)（[UDP](https://d.hatena.ne.jp/keyword/UDP)・[TCP](https://d.hatena.ne.jp/keyword/TCP)）
+
+- ポート番号
+
+- [マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)アドレス（[UDP](https://d.hatena.ne.jp/keyword/UDP)の場合）
+
+#### 7.6 SOME/IP Binding
+
+- ara::com [API](https://d.hatena.ne.jp/keyword/API)とSOMEIPの[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)について説明
+
+- アプリ実装者はara::com [API](https://d.hatena.ne.jp/keyword/API)を使用するだけでSOMEIP通信ができる（できるらしいよ）
+
+- SOMEIP-SDで動的にサービスを見つけることができる
+
+- SOME/IPの通信形式として
+
+- Method（確実性の観点から[TCP](https://d.hatena.ne.jp/keyword/TCP)を使うことが多い）
+
+- Event（効率性の観点から[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)、[UDP](https://d.hatena.ne.jp/keyword/UDP)を使うことが多い）
+
+- Field
+
+- SOME/IPのデプロイメント設定（manifest.[xml](https://d.hatena.ne.jp/keyword/xml)） で以下（など）を定義
+
+- 通信に使うポート番号
+
+- L4の[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)（[UDP](https://d.hatena.ne.jp/keyword/UDP)か[TCP](https://d.hatena.ne.jp/keyword/TCP)）
+
+- [マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)アドレス
+
+- [TTL](https://d.hatena.ne.jp/keyword/TTL)や再送設定
+
+- SOME/IP通信中に起きたエラー（接続断、受信失敗など）は、ara::com [API](https://d.hatena.ne.jp/keyword/API) を通じてアプリケーションに通知
+
+- ara::comの[API](https://d.hatena.ne.jp/keyword/API)がエラーを返すのでアプリはそれを適切にハンドリングする必要あり
+
+- ID体系として
+
+- ServiceID：サービスを特定
+
+- InstanceID：同じサービスを複数提供するときの識別子
+
+- MethodID
+
+- EventID
+
+- EventのSubscribe
+
+- ara::com [API](https://d.hatena.ne.jp/keyword/API)のSubscribe()を呼び出すと、SOME/IP-SDのSubscribeEventGroup メッセージがサーバに飛ぶ
+
+- クライアントは定期的にSubscribeを送信する。[TTL](https://d.hatena.ne.jp/keyword/TTL)が設定されており、[TTL](https://d.hatena.ne.jp/keyword/TTL)が切れていればEventは通知されない
+
+- サーバから送信されるSubscribeACKにも[TTL](https://d.hatena.ne.jp/keyword/TTL)が含まれるので、サーバの[TTL](https://d.hatena.ne.jp/keyword/TTL)＜クライアントの[TTL](https://d.hatena.ne.jp/keyword/TTL)の場合はサーバの[TTL](https://d.hatena.ne.jp/keyword/TTL)に制限される
+
+- Unsubscribe()を呼び出すとStopSubscribeEventGroupメッセージがサーバに飛ぶ
+
+- 通信エラーのハンドリングについて
+
+- [タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)や接続不良（[TCP](https://d.hatena.ne.jp/keyword/TCP)のコネクションが切れるなど）等のエラーに対して、リトライや縮退など適切なハンドリングをアプリは実装する必要がある
+
+→複数回サーバから返信が来なかったら縮退に入ってユーザに伝えるなど
+
+#### 7.7 IPC Binding
+
+- １つの[ECU](https://d.hatena.ne.jp/keyword/ECU)内の通信
+
+- SOMEIPのようなネットワークスタックは使わず、より効率的な通信手段を使う
+
+- IPC Bindingでは[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)などネットワーク通信に必要な家庭を避けることができる
+
+- アプリコードはIPC通信であってもそうでなくても記載は変わらない
+
+- どの通信形式を使うかはDeploymentManifestで定義する
+
+- IPC Bindingの内部実像はベンダーによって変わる（共有メモリ、ローカルソケットなど）
+
+- 同じサービスがIPCでも外部ネットワークを使う場合でも動的に最適な経路を選択してくれる
+
+- Manifestでどちらかを選択することもできる
+
+
+
+
+
+【気になったこと】
+
+・同じara::com [API](https://d.hatena.ne.jp/keyword/API)を叩けばIPCでも外部通信でも同じように通信できる
+
+・けれども、IPCの場合にSubscribeの[TTL](https://d.hatena.ne.jp/keyword/TTL)のようなものは存在しないらしい
+
+・成否はSubscribe()の戻り値で管理される
+
+
+
+IPC、外部通信の実装の仕様を見ないとだなあ

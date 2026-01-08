@@ -1,0 +1,270 @@
+---
+title: "【AUTOSAR】SOME/IP Service Discovery Protocol Specification（R22-11）を読んでみる"
+date: "2025-05-11"
+description: "PRS_SOMEIPSD_00351 - FindServeiceのフィールド設定について - これはパケットを見よう PRS_SOMEIPSD_00528・PRS_SOMEIPSD_00529 - FindServiceにはIP EndPointOptionを含めないし、含んでいた場合も無視する ..."
+category: "IT"
+tags: []
+image: ""
+---
+
+###### [PRS_SOMEIPSD_00351]
+
+- FindServeiceのフィールド設定について
+
+- これはパケットを見よう
+
+###### [PRS_SOMEIPSD_00528]・[PRS_SOMEIPSD_00529]
+
+- FindServiceにはIP EndPointOptionを含めないし、含んでいた場合も無視する
+
+###### [PRS_SOMEIPSD_00839]
+
+- サーバ側が Initial Wait Phaseの場合受信したFindServiceは無視する
+
+- Initial Wait Phaseについてはこの後解説があるはず
+
+##### Offer Service Entry
+
+###### [PRS_SOMEIPSD_00355]〜[PRS_SOMEIPSD_00827]
+
+- ara::com仕様書で書かれていたものと同様なので飛ばす
+
+- OfferServiceにはIPEndPointOptionが含まれる
+
+- [UDP](https://d.hatena.ne.jp/keyword/UDP)の場合、クライアントはこのIPに向けてSubscribeを出す
+
+- OfferServiceの[TTL](https://d.hatena.ne.jp/keyword/TTL)を0xFFFFFFにすると再起動されるまで有効となる。一方0x000000にするとStopOfferServiceとなる
+
+##### 5.1.2.6 Endpoint Handling for Services and Events
+
+###### [PRS_SOMEIPSD_00476]
+
+- EndPointが静的にManifestに定義されていたとしても、実際にOfferServiceで送られてきたEndPointが異なった場合は上書きする
+
+###### [PRS_SOMEIPSD_00360]
+
+- OfferServiceに含まれるEndPointからEventは送信される。かつ、クライアントはメソッドのReqを送る
+
+###### [PRS_SOMEIPSD_00361]
+
+- EndPointが[UDP](https://d.hatena.ne.jp/keyword/UDP)の場合、そのままSOME/IP通信に使われる
+
+###### [PRS_SOMEIPSD_00362]
+
+- [TCP](https://d.hatena.ne.jp/keyword/TCP)の場合、クライアントは３ウェイハンドシェイクをする
+
+###### [PRS_SOMEIPSD_00801]
+
+- サービスは[UDP](https://d.hatena.ne.jp/keyword/UDP)と[TCP](https://d.hatena.ne.jp/keyword/TCP)の両方を同時に使用できる
+
+- Eventは[UDP](https://d.hatena.ne.jp/keyword/UDP)、Methodは[TCP](https://d.hatena.ne.jp/keyword/TCP)とか
+
+###### [PRS_SOMEIPSD_00802]
+
+- どのメッセージで[UDP](https://d.hatena.ne.jp/keyword/UDP) or [TCP](https://d.hatena.ne.jp/keyword/TCP)を使うかは明示的に設定する必要がある
+
+- ManifestにEvent、Methodごとに記載する必要がある
+
+....
+
+###### [PRS_SOMEIPSD_00481]
+
+- ServiceInstanceを分ける場合は、Endpointを分けることで識別する必要
+
+Eventgroup Endpoints
+
+[PRS_SOMEIPSD_00484]
+
+- Subscribe Eventgroup メッセージに含まれるEndPointへサーバはイベントを送信する
+
+- Eventを[TCP](https://d.hatena.ne.jp/keyword/TCP)で送信する場合は、クライアントがSubscribe Eventgroup メッセージ送信前に[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションを貼り、このコネクション上でEventを送信する
+
+[PRS_SOMEIPSD_00487]
+
+- 初期イベントは必ずunicastで送られる必要がある
+
+- Initial Eventってなんだ？
+
+[PRS_SOMEIPSD_00488]
+
+-
+
+Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
+
+- EventをMulticastで送る設定した場合に使用するMulticastIPのこと
+
+サービスディスカバリからイベント・メソッドを送るまでの流れがわかりやすく書かれている：
+
+![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250511191711.png)
+
+5.1.3 Service Discovery Messages
+
+[PRS_SOMEIPSD_00600]
+
+- すべてのSDメッセージはSD_PORT（＝30490）へ送られる
+
+[PRS_SOMEIPSD_00601]
+
+- SD_PORTはunicastでもMulticastでも送信元ポートとして使われる
+
+[PRS_SOMEIPSD_00603]
+
+- すべてのSDメッセージはSD_MULTICAST_IPへ送られる
+
+##### 5.1.3.1 Eventgroup Entry
+
+##### Subscribe Eventgroup Entry
+
+##### Stop Subscribe Eventgroup Entry
+
+##### Subscribe Eventgroup Acknowledgement (Subscribe Eventgroup Ack) Entry
+
+##### Subscribe Eventgroup Negative Acknowledgement (Subscribe Eventgroup Nack) Entry
+
+###### [PRS_SOMEIPSD_00566]
+
+- Subscribe Eventgroup Nackは必要な[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションが存在しない場合も送られる
+
+###### [PRS_SOMEIPSD_00527]
+
+- [TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションが必要な SubscribeEventgroupについてNACKが帰ってきた場合はクライアントは[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションを再チェックして、[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションを貼り直す
+
+- NACKを受け取ると[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションが切れることになる
+
+##### 5.1.4 Service Discovery Communication Behavior
+
+###### [PRS_SOMEIPSD_00800]
+
+- SDのメッセージをなるべく減らすため、メッセージはなるべくまとめて送るべき
+
+- OfferやSubscribeEventgroupAck を同じメッセージに含めて送信できる
+
+##### 5.1.4.1 Startup Behavior
+
+###### [PRS_SOMEIPSD_00395]
+
+- SDにおいて各[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)は少なくとも以下３つの状態を実装する
+
+- Initial Wait Phase
+
+- Repetition Phase
+
+- Main Phase
+
+###### [PRS_SOMEIPSD_00397]
+
+- クライアントサービスの[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)は以下の条件を満たした時、Initial Wait Phaseに入る
+
+-
+
+対応するインターフェースのリンクが Up 状態
+
+
+
+-
+
+アプリケーションからそのクライアントサービスが要求された
+
+###### [PRS_SOMEIPSD_00133]
+
+- サーバサービスの[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)は以下の条件を満たした時、Initial Wait Phaseに入る
+
+-
+
+対応するインターフェースのリンクが Up 状態
+
+- サーバのサービスが提供可能になった
+
+###### [PRS_SOMEIPSD_00399]
+
+- Initial Wait Phase に入った後、INITIAL_DELAYの時間だけ待機してから、SDメッセージを送信する
+
+###### [PRS_SOMEIPSD_00400]・[PRS_SOMEIPSD_00401]
+
+- INITIAL_DELAYは最大値と最小値の範囲で記載され、その範囲からランダムの値を取る
+
+- ネットワーク負荷を下げるため
+
+###### [PRS_SOMEIPSD_00404]
+
+- 初回のSDメッセージを送信したら、Repetition Phaseに移行する
+
+###### [PRS_SOMEIPSD_00405]
+
+- Repetition Phaseでの待機時間はREPETITIONS_BASE_DELAYに基づく
+
+###### [PRS_SOMEIPSD_00406]
+
+- Repetition Phaseではメッセージ送信のたびに待機時間が倍増
+
+###### [PRS_SOMEIPSD_00407]
+
+- メッセージはREPETITIONS_MAXの回数まで送信可能
+
+###### [PRS_SOMEIPSD_00408]
+
+- クライアントはOfferエントリを受信したらMain Phaseへ遷移し、Findメッセージを送信しない
+
+###### [PRS_SOMEIPSD_00409]
+
+- REPETITIONS_MAX = 0と設定した場合、Repetition Phaseはスキップされ、Main Phaseへ
+
+###### [PRS_SOMEIPSD_00410]
+
+- Repetition Phaseの後、Main Phaseに入る
+
+###### [PRS_SOMEIPSD_00411]
+
+- Main Phaseへ遷移後、CYCLIC_OFFER_DELAYだけ待機して最初のOfferエントリを送信する
+
+###### [PRS_SOMEIPSD_00412]
+
+- CYCLIC_OFFER_DELAYが設定されている場合は、 Main PhaseでOfferを周期的に送信する
+
+###### [PRS_SOMEIPSD_00413]
+
+- Offerメッセージを送信したら次のメッセージ送信までCYCLIC_OFFER_DELAYだけ待つ必要がある
+
+###### [PRS_SOMEIPSD_00415]
+
+- Main PhaseでのFindメッセージの周期的送信は禁止されている
+
+###### [PRS_SOMEIPSD_00582]
+
+-
+
+Subscribe EventGroupメッセージは周期的に送信されるOfferメッセージによってトリガーされる
+
+- これは毎回のOfferに対してSubscribeを送れということではないっぽい
+
+##### 5.1.4.2 Server Answer Behavior
+
+###### [PRS_SOMEIPSD_00417]
+
+- 以下の場合でREQUEST_RESPONSE_DELAYにもとづく遅延を入れる必要がある
+
+- Find（Multicats）受信からOffer送信まで
+
+- Offer（Multicats）受信からSubscribe送信まで
+
+###### [PRS_SOMEIPSD_00419]
+
+- ユニキャストのメッセージにユニキャストで応答する場合は遅延の対象外
+
+###### [PRS_SOMEIPSD_00422]
+
+- 基本的な設計としては、FindServiceへの嘔吐は全てユニキャストでOffer Serviceを返答するべき
+
+###### [PRS_SOMEIPSD_00423]
+
+- 最適化のため、以下の振る舞いがサポートされる
+
+-
+
+Unicast Flag = 1のFindメッセージを Main Phase で受信。かつ最後の Offer 送信から CYCLIC_OFFER_DELAY の半分より短い時間であれば、ユニキャストで応答してよい
+
+- CYCLIC_OFFER_DELAYの半分以上であればMulticastで応答しても良い
+
+[PRS_SOMEIPSD_00811]
+
+- 純粋なイベントメッセージに対して初期値を要求してはいけない
