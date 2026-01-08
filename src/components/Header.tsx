@@ -7,7 +7,7 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Categories", href: "/categories" },
-  { name: "タグ", href: "/tags" },
+  { name: "Tags", href: "/tags" },
 ];
 
 export default function Header() {

@@ -11,8 +11,8 @@ export default function PostCard({ post }: PostCardProps) {
   return (
     <article className="card overflow-hidden">
       <Link href={`/posts/${post.slug}`} className="block group">
-        {/* アイキャッチ画像 */}
-        <div className="relative aspect-[16/9] bg-[var(--background-secondary)] overflow-hidden">
+        {/* アイキャッチ画像 - 16:9アスペクト比 */}
+        <div className="relative aspect-video bg-[var(--background-secondary)] overflow-hidden">
           {post.image ? (
             <Image
               src={post.image}
@@ -22,33 +22,33 @@ export default function PostCard({ post }: PostCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-6xl">
+            <div className="absolute inset-0 flex items-center justify-center text-5xl">
               🐨
             </div>
           )}
         </div>
 
         {/* コンテンツ */}
-        <div className="p-6">
+        <div className="p-4">
           {/* カテゴリ */}
           {post.category && (
-            <span className="category mb-3">{post.category}</span>
+            <span className="category text-[10px] mb-2">{post.category}</span>
           )}
 
           {/* タイトル */}
-          <h2 className="text-xl font-bold mt-2 mb-3 text-[var(--color-primary-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-300 line-clamp-2 leading-snug">
+          <h2 className="text-base font-bold mt-1.5 mb-2 text-[var(--color-primary-dark)] group-hover:text-[var(--color-accent)] transition-colors duration-300 leading-snug">
             {post.title}
           </h2>
 
           {/* 説明 */}
           {post.description && (
-            <p className="text-[15px] text-[var(--foreground-muted)] mb-4 line-clamp-2 leading-relaxed">
+            <p className="text-[13px] text-[var(--foreground-muted)] mb-3 line-clamp-2 leading-relaxed">
               {post.description}
             </p>
           )}
 
           {/* メタ情報 */}
-          <div className="flex items-center gap-4 text-[13px] text-[var(--foreground-subtle)] mb-3">
+          <div className="flex items-center gap-3 text-[11px] text-[var(--foreground-subtle)] mb-2">
             {post.date && (
               <time dateTime={post.date}>
                 {format(new Date(post.date), "yyyy.MM.dd")}
@@ -58,17 +58,17 @@ export default function PostCard({ post }: PostCardProps) {
 
           {/* タグ */}
           {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {post.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs px-2.5 py-1 bg-[var(--background-secondary)] text-[var(--foreground-muted)] rounded-full"
+                  className="text-[10px] px-2 py-0.5 bg-[var(--background-secondary)] text-[var(--foreground-muted)] rounded-full"
                 >
                   {tag}
                 </span>
               ))}
               {post.tags.length > 3 && (
-                <span className="text-xs text-[var(--foreground-subtle)] py-1">
+                <span className="text-[10px] text-[var(--foreground-subtle)] py-0.5">
                   +{post.tags.length - 3}
                 </span>
               )}
