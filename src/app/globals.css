@@ -126,6 +126,22 @@ a:hover {
   border-bottom: 2px solid var(--border-color);
 }
 
+/* 画像キャプション（画像直後のイタリック） */
+.prose p:has(> img) + p > em:first-child:last-child,
+.prose p:has(> img) + p:has(> em:first-child) {
+  display: block;
+  text-align: center;
+  margin-top: -1rem;
+  margin-bottom: 1.5rem;
+  font-size: 14px;
+  font-style: normal;
+  color: var(--foreground-muted);
+}
+
+.prose p:has(> img) + p > em:first-child {
+  font-style: normal;
+}
+
 /* 目次スタイル */
 .toc {
   background: var(--background-secondary);
