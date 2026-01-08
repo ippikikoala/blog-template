@@ -136,9 +136,42 @@ git push origin main
 ```
 scripts/
 ├── download_images.py      # 画像ダウンロード
-├── convert_to_mdx.py        # MDX変換
-└── README.md                # このファイル
+├── convert_to_mdx.py       # MDX変換
+├── update_eyecatch.py      # アイキャッチ画像更新
+└── README.md               # このファイル
 ```
+
+## update_eyecatch.py
+
+はてなブログAPIから各記事のアイキャッチ画像（og:image）を取得し、MDXファイルの`image`フィールドを更新するスクリプト。
+
+### 使い方
+
+```bash
+python3 scripts/update_eyecatch.py
+```
+
+### 処理内容
+
+1. はてなブログAtomPub APIで記事URL一覧を取得
+2. 各記事ページにアクセスし、`og:image`からアイキャッチURLを抽出
+3. はてなCDN URLからファイル名を抽出
+4. `hatena_images/image_mapping.txt`と照合してR2 URLに変換
+5. 対応するMDXファイルの`image`フィールドを更新
+
+### 設定（スクリプト内で変更可能）
+
+```python
+HATENA_ID = "ippiki_koala"
+BLOG_DOMAIN = "ippikikoala.hatenablog.com"
+API_KEY = "your_api_key"
+R2_BASE_URL = "https://pub-xxx.r2.dev/posts"
+```
+
+### 出力
+
+- R2に画像がない場合は警告を表示
+- 更新件数のサマリーを表示
 
 ## 補足
 

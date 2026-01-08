@@ -172,6 +172,40 @@ font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
 }
 ```
 
+## 画像キャプション
+
+記事内で画像の直後にイタリックで記述したテキストは、キャプションとしてスタイリングされる。
+
+### 記述方法
+
+```markdown
+![alt text](image-url.jpg)
+
+_これがキャプションになります_
+```
+
+### スタイル
+
+```css
+/* 画像直後のイタリックをキャプションとして表示 */
+.prose p:has(> img) + p > em:first-child {
+  display: block;
+  text-align: center;
+  margin-top: -1rem;      /* 画像に近づける */
+  margin-bottom: 1.5rem;
+  font-size: 14px;
+  font-style: normal;     /* イタリック解除 */
+  color: var(--foreground-muted);
+}
+```
+
+### 表示結果
+
+- 中央寄せ
+- 画像との間隔が狭い（キャプションであることが明確）
+- フォントサイズ 14px
+- グレー色（#666666）
+
 ## ダークモード
 
 **対応しない**。常にライトテーマで表示。
