@@ -31,9 +31,9 @@ image: "https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250511191711
 
 - OfferServiceにはIPEndPointOptionが含まれる
 
-- [UDP](https://d.hatena.ne.jp/keyword/UDP)の場合、クライアントはこのIPに向けてSubscribeを出す
+- UDPの場合、クライアントはこのIPに向けてSubscribeを出す
 
-- OfferServiceの[TTL](https://d.hatena.ne.jp/keyword/TTL)を0xFFFFFFにすると再起動されるまで有効となる。一方0x000000にするとStopOfferServiceとなる
+- OfferServiceのTTLを0xFFFFFFにすると再起動されるまで有効となる。一方0x000000にするとStopOfferServiceとなる
 
 ##### 5.1.2.6 Endpoint Handling for Services and Events
 
@@ -47,21 +47,21 @@ image: "https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250511191711
 
 ###### [PRS_SOMEIPSD_00361]
 
-- EndPointが[UDP](https://d.hatena.ne.jp/keyword/UDP)の場合、そのままSOME/IP通信に使われる
+- EndPointがUDPの場合、そのままSOME/IP通信に使われる
 
 ###### [PRS_SOMEIPSD_00362]
 
-- [TCP](https://d.hatena.ne.jp/keyword/TCP)の場合、クライアントは３ウェイハンドシェイクをする
+- TCPの場合、クライアントは３ウェイハンドシェイクをする
 
 ###### [PRS_SOMEIPSD_00801]
 
-- サービスは[UDP](https://d.hatena.ne.jp/keyword/UDP)と[TCP](https://d.hatena.ne.jp/keyword/TCP)の両方を同時に使用できる
+- サービスはUDPとTCPの両方を同時に使用できる
 
-- Eventは[UDP](https://d.hatena.ne.jp/keyword/UDP)、Methodは[TCP](https://d.hatena.ne.jp/keyword/TCP)とか
+- EventはUDP、MethodはTCPとか
 
 ###### [PRS_SOMEIPSD_00802]
 
-- どのメッセージで[UDP](https://d.hatena.ne.jp/keyword/UDP) or [TCP](https://d.hatena.ne.jp/keyword/TCP)を使うかは明示的に設定する必要がある
+- どのメッセージでUDP or TCPを使うかは明示的に設定する必要がある
 
 - ManifestにEvent、Methodごとに記載する必要がある
 
@@ -77,7 +77,7 @@ Eventgroup Endpoints
 
 - Subscribe Eventgroup メッセージに含まれるEndPointへサーバはイベントを送信する
 
-- Eventを[TCP](https://d.hatena.ne.jp/keyword/TCP)で送信する場合は、クライアントがSubscribe Eventgroup メッセージ送信前に[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションを貼り、このコネクション上でEventを送信する
+- EventをTCPで送信する場合は、クライアントがSubscribe Eventgroup メッセージ送信前にTCPコネクションを貼り、このコネクション上でEventを送信する
 
 [PRS_SOMEIPSD_00487]
 
@@ -123,13 +123,13 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 ###### [PRS_SOMEIPSD_00566]
 
-- Subscribe Eventgroup Nackは必要な[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションが存在しない場合も送られる
+- Subscribe Eventgroup Nackは必要なTCPコネクションが存在しない場合も送られる
 
 ###### [PRS_SOMEIPSD_00527]
 
-- [TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションが必要な SubscribeEventgroupについてNACKが帰ってきた場合はクライアントは[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションを再チェックして、[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションを貼り直す
+- TCPコネクションが必要な SubscribeEventgroupについてNACKが帰ってきた場合はクライアントはTCPコネクションを再チェックして、TCPコネクションを貼り直す
 
-- NACKを受け取ると[TCP](https://d.hatena.ne.jp/keyword/TCP)コネクションが切れることになる
+- NACKを受け取るとTCPコネクションが切れることになる
 
 ##### 5.1.4 Service Discovery Communication Behavior
 
@@ -143,7 +143,7 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 ###### [PRS_SOMEIPSD_00395]
 
-- SDにおいて各[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)は少なくとも以下３つの状態を実装する
+- SDにおいて各インスタンスは少なくとも以下３つの状態を実装する
 
 - Initial Wait Phase
 
@@ -153,7 +153,7 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 ###### [PRS_SOMEIPSD_00397]
 
-- クライアントサービスの[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)は以下の条件を満たした時、Initial Wait Phaseに入る
+- クライアントサービスのインスタンスは以下の条件を満たした時、Initial Wait Phaseに入る
 
 -
 
@@ -167,7 +167,7 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 ###### [PRS_SOMEIPSD_00133]
 
-- サーバサービスの[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)は以下の条件を満たした時、Initial Wait Phaseに入る
+- サーバサービスのインスタンスは以下の条件を満たした時、Initial Wait Phaseに入る
 
 -
 

@@ -37,7 +37,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Meiryo", sans-serif;
-  font-size: 17px;
+  font-size: 15px;
   line-height: 1.8;
   letter-spacing: 0.01em;
 }
@@ -103,6 +103,7 @@ a:hover {
   --tw-prose-quotes: var(--foreground-muted);
   --tw-prose-code: var(--foreground);
   --tw-prose-pre-bg: var(--background-secondary);
+  font-size: 17px;
 }
 
 .prose img {

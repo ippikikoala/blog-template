@@ -1,7 +1,7 @@
 ---
 title: "【AUTOSAR】Specification of Execution Managementを読んでみる"
 date: "2025-04-19"
-description: "確認するべきこと - これを最初にExacution Manifestで確認しよう - 自分のアプリがどのFGに属するか - 他アプリとの依存関係は？ - 起動タイムアウト(https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A..."
+description: "確認するべきこと - これを最初にExacution Manifestで確認しよう - 自分のアプリがどのFGに属するか - 他アプリとの依存関係は？ - 起動タイムアウト"
 category: "IT"
 tags: []
 image: ""
@@ -15,7 +15,7 @@ image: ""
 
 - 他アプリとの依存関係は？
 
-- 起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)に関わるnumberOfRestartAttemptsは？
+- 起動タイムアウトに関わるnumberOfRestartAttemptsは？
 
 - 理解しておきたい「状態」について
 
@@ -33,9 +33,9 @@ image: ""
 
 - EMが受け取ったアプリのkRunnningレポートによってPHMがプロセス監視を開始
 
-- 起動時[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)がやばい
+- 起動時タイムアウトがやばい
 
-- [タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)が発生した場合、EMは設定された回数（numberOfRestartAttempts で定義）まで再起動を試行
+- タイムアウトが発生した場合、EMは設定された回数（numberOfRestartAttempts で定義）まで再起動を試行
 
 - 再試行回数を超えると、EMはプロセスをOSにより強制終了（sigkill等）させる
 
@@ -215,11 +215,11 @@ SMはAUTOSAR Adaptive Platform 全体の動作状態を定義・制御する役�
 
 - 新しいFGに属するプロセスを起動
 
-- FGの状態遷移時の起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)
+- FGの状態遷移時の起動タイムアウト
 
 ![画像](https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250419183957.png)
 
-- 起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)するとFGの状態遷移は中止
+- 起動タイムアウトするとFGの状態遷移は中止
 
 - SMへ失敗を報告
 
@@ -227,7 +227,7 @@ SMはAUTOSAR Adaptive Platform 全体の動作状態を定義・制御する役�
 
 - EMは起動直後、自動的に Startup状態への遷移を試みる
 
-- Startupへの遷移に失敗した場合、EMはUnrecoverable State（回復[不能](https://d.hatena.ne.jp/keyword/%C9%D4%C7%BD)状態）へ移行
+- Startupへの遷移に失敗した場合、EMはUnrecoverable State（回復不能状態）へ移行
 
 Function Group State
 
@@ -241,23 +241,23 @@ Function Group State
 
 - この後はFGにまたがるプロセスと複数プロセスの依存について書かれている
 
-プロセス終了処理の[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)
+プロセス終了処理のタイムアウト
 
 - EMはプロセスの終了にかかる時間を監視
 
-- 終了が[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)すると、EMはOSに強制終了（sigkill等）を要求する
+- 終了がタイムアウトすると、EMはOSに強制終了（sigkill等）を要求する
 
 - sigtermはお行儀のよい終了方法でsigkillはOSレベルで実行される強制終了
 
-起動時の[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)
+起動時のタイムアウト
 
 - EMはプロセスがRunningになるまでの時間を監視
 
-- [タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)が発生した場合、EMは設定された回数（numberOfRestartAttempts で定義）まで再起動を試行
+- タイムアウトが発生した場合、EMは設定された回数（numberOfRestartAttempts で定義）まで再起動を試行
 
 - 再試行回数を超えると、EMはプロセスをOSにより強制終了（sigkill等）させる
 
-- 起動[タイムアウト](https://d.hatena.ne.jp/keyword/%A5%BF%A5%A4%A5%E0%A5%A2%A5%A6%A5%C8)が発生すると、遷移先の状態（RequestedState）には到達[不能](https://d.hatena.ne.jp/keyword/%C9%D4%C7%BD)
+- 起動タイムアウトが発生すると、遷移先の状態（RequestedState）には到達不能
 
 - EMはSMに失敗を報告
 

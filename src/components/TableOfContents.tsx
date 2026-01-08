@@ -1,3 +1,5 @@
+import { slug as slugify } from "github-slugger";
+
 interface TocItem {
   id: string;
   text: string;
@@ -16,10 +18,7 @@ function generateToc(content: string): TocItem[] {
   while ((match = headingRegex.exec(content)) !== null) {
     const level = match[1].length;
     const text = match[2].trim();
-    const id = text
-      .toLowerCase()
-      .replace(/[^\w\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+/g, "-")
-      .replace(/^-+|-+$/g, "");
+    const id = slugify(text);
 
     toc.push({ id, text, level });
   }

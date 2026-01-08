@@ -1,7 +1,7 @@
 ---
 title: "【AUTOSAR】Specification of Communication Management（R21-11）を読んでみる（~7.8.1.4）"
 date: "2025-05-11"
-description: "SWS_CM_10384 / SWS_CM_10385 - サービスインターフェースのデプロイメントの変更はアプリの再コンパイル(https://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB)なしで可能である必要がある - アプリを再度コ..."
+description: "SWS_CM_10384 / SWS_CM_10385 - サービスインターフェースのデプロイメントの変更はアプリの再コンパイルなしで可能である必要がある - アプリを再度コ..."
 category: "IT"
 tags: []
 image: ""
@@ -9,17 +9,17 @@ image: ""
 
 ###### SWS_CM_10384 / SWS_CM_10385
 
-- サービスインターフェースのデプロイメントの変更はアプリの再[コンパイル](https://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB)なしで可能である必要がある
+- サービスインターフェースのデプロイメントの変更はアプリの再コンパイルなしで可能である必要がある
 
-- アプリを再度[コンパイル](https://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB)しなくても通信デプロイ設定を変えれるような独立性を提供する
+- アプリを再度コンパイルしなくても通信デプロイ設定を変えれるような独立性を提供する
 
-- SOMEIPから[通信プロトコル](https://d.hatena.ne.jp/keyword/%C4%CC%BF%AE%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)を変更するときや、イベントのSubscribeの[TTL](https://d.hatena.ne.jp/keyword/TTL)を変えたいときや、[後方互換](https://d.hatena.ne.jp/keyword/%B8%E5%CA%FD%B8%DF%B4%B9)性のあるバージョン変更、ポート番号などServiceInstanceToMachineMapping の属性値の変更
+- SOMEIPから通信プロトコルを変更するときや、イベントのSubscribeのTTLを変えたいときや、後方互換性のあるバージョン変更、ポート番号などServiceInstanceToMachineMapping の属性値の変更
 
 ###### SWS_CM_10590
 
-- ProvidedApServiceInstance および RequiredApServiceInstanceにおいて、::等の抽象的なネットワーク[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)を可能とすること
+- ProvidedApServiceInstance および RequiredApServiceInstanceにおいて、::等の抽象的なネットワークバインディングを可能とすること
 
-- あまり読み取れなかった。ポート番号12345のportnameをtestportにすることで、testnameのポート番号を変更しても[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)されていたインターフェースに影響を与えない的な？
+- あまり読み取れなかった。ポート番号12345のportnameをtestportにすることで、testnameのポート番号を変更してもバインディングされていたインターフェースに影響を与えない的な？
 
 ###### SWS_CM_10416
 
@@ -29,15 +29,15 @@ image: ""
 
 - SOME/IP Eventはunicastとmulticastに対応
 
-- イベント配信にユニキャスを使う場合、**multi-cast-threshold に達したら[マルチキャスト](https://d.hatena.ne.jp/keyword/%A5%DE%A5%EB%A5%C1%A5%AD%A5%E3%A5%B9%A5%C8)にするような設定が可能**
+- イベント配信にユニキャスを使う場合、**multi-cast-threshold に達したらマルチキャストにするような設定が可能**
 
 ###### [SWS_CM_10000] SOME/IP Compliance
 
-- SOME/IPネットワーク[バインディング](https://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0)は、別仕様書で定義されたSOME/IP[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)およびSOME/IPサービスディスカバリ[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)を実装する必要がある
+- SOME/IPネットワークバインディングは、別仕様書で定義されたSOME/IPプロトコルおよびSOME/IPサービスディスカバリプロトコルを実装する必要がある
 
 ###### [SWS_CM_10013] Header Byte order
 
-- 全てのヘッダーはビッグエディアンで[エンコード](https://d.hatena.ne.jp/keyword/%A5%A8%A5%F3%A5%B3%A1%BC%A5%C9)される必要がある
+- 全てのヘッダーはビッグエディアンでエンコードされる必要がある
 
 ###### [SWS_CM_10172] Payload Byte order definition
 
@@ -81,7 +81,7 @@ image: ""
 
 - ServiceID：サービスを一意に識別
 
-- InstanceID：[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を識別。 requiredServiceInstanceIdをAll（0xffff）とした場合は全ての[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)IDを対象とする
+- InstanceID：インスタンスを識別。 requiredServiceInstanceIdをAll（0xffff）とした場合は全てのインスタンスIDを対象とする
 
 - MajorVersion：メジャーバージョンは一致しないと互換性がないと判断される
 
@@ -93,7 +93,7 @@ image: ""
 
 - versionDrivenFindBehavior が exactOrAnyMinorVersion に設定されている場合は、minorVersionはrequiredMinorVersionに指定のものに。requiredMinorVersionがAllの場合は0xffff ffffにセット
 
-- [TTL](https://d.hatena.ne.jp/keyword/TTL)： serviceFindTimeToLiveに設定。クライアントが送ったFindがサーバ側にどれくらい記憶されるか決まる
+- TTL： serviceFindTimeToLiveに設定。クライアントが送ったFindがサーバ側にどれくらい記憶されるか決まる
 
 ###### [SWS_CM_10202] Version blacklist
 
@@ -105,17 +105,17 @@ image: ""
 
 - ServiceID：サービスを一意に識別
 
-- InstanceID：[インスタンス](https://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9)を識別。
+- InstanceID：インスタンスを識別。
 
 - MajorVersion：serviceInterfaceVersionで定義
 
 - minorVersion：serviceInterfaceVersionで定義
 
-- [TTL](https://d.hatena.ne.jp/keyword/TTL)： serviceOfferTimeToLiveに設定
+- TTL： serviceOfferTimeToLiveに設定
 
-- EndPointOption（IPv４、[IPv6](https://d.hatena.ne.jp/keyword/IPv6)）
+- EndPointOption（IPv４、IPv6）
 
-- [トランスポート層](https://d.hatena.ne.jp/keyword/%A5%C8%A5%E9%A5%F3%A5%B9%A5%DD%A1%BC%A5%C8%C1%D8)の[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)
+- トランスポート層のプロトコル
 
 - ポート番号が０に設定されている場合は動的に割り当てられたポートを使用する
 
@@ -127,21 +127,21 @@ image: ""
 
 - ほとんどOfferメッセージと同じものを設定する
 
-- [TTL](https://d.hatena.ne.jp/keyword/TTL)は0x000000に設定する
+- TTLは0x000000に設定する
 
-- 通常のOfferメッセージとの識別には[TTL](https://d.hatena.ne.jp/keyword/TTL)を見る。[WireShark](https://d.hatena.ne.jp/keyword/WireShark)は賢いので勝手に識別してくれた気もするが
+- 通常のOfferメッセージとの識別にはTTLを見る。WireSharkは賢いので勝手に識別してくれた気もするが
 
 ###### [SWS_CM_10377] Sending SOME/IP SubscribeEventgroup messages
 
 - Service ProxyクラスのSubscribe()メソッドを叩くと、アクティブな購読が存在しない場合にSubscribeEventgroup メッセージが飛ぶ
 
-- アクティブな購読が存在しない場合というのは、初回の場合や、Subscribe ACKの[TTL](https://d.hatena.ne.jp/keyword/TTL)が切れた場合
+- アクティブな購読が存在しない場合というのは、初回の場合や、Subscribe ACKのTTLが切れた場合
 
 - 購買状態がアクティブの場合はSubscribeEventgroup メッセージを送信してはいけない
 
 ###### [SWS_CM_10381] Sending SOME/IP SubscribeEventgroup messages - renewal
 
-- Subscribeの[TTL](https://d.hatena.ne.jp/keyword/TTL)が失効する前に購買状態を更新する場合は、再度Subscribeメッセージを送信する
+- SubscribeのTTLが失効する前に購買状態を更新する場合は、再度Subscribeメッセージを送信する
 
 ###### [SWS_CM_00205] Content of SOME/IP SubscribeEventgroup message
 
@@ -151,11 +151,11 @@ image: ""
 
 - EventGroupID：Manifestに記載のものを使用
 
-- [TTL](https://d.hatena.ne.jp/keyword/TTL)：ManifestのsdClientEventGroupTimingConfigで定義
+- TTL：ManifestのsdClientEventGroupTimingConfigで定義
 
-- [IPv4](https://d.hatena.ne.jp/keyword/IPv4) or [IPv6](https://d.hatena.ne.jp/keyword/IPv6) Endpoint Option：クライアントがイベントを受け取るIP情報を記載
+- IPv4 or IPv6 Endpoint Option：クライアントがイベントを受け取るIP情報を記載
 
-- イベントを受信するトランスポート[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)
+- イベントを受信するトランスポートプロトコル
 
 ###### [SWS_CM_00206] SOME/IP SubscribeEventgroupAck message
 
@@ -165,19 +165,19 @@ image: ""
 
 - ほとんどSubscribeEventGroupメッセージと同じものを設定する
 
-- [TTL](https://d.hatena.ne.jp/keyword/TTL)：サーバの[TTL](https://d.hatena.ne.jp/keyword/TTL)＜クライアントの[TTL](https://d.hatena.ne.jp/keyword/TTL)の場合はサーバの[TTL](https://d.hatena.ne.jp/keyword/TTL)に制限される
+- TTL：サーバのTTL＜クライアントのTTLの場合はサーバのTTLに制限される
 
-- [IPv4](https://d.hatena.ne.jp/keyword/IPv4) or [IPv6](https://d.hatena.ne.jp/keyword/IPv6) Multicast Option：（購読数が[閾値](https://d.hatena.ne.jp/keyword/%EF%E7%C3%CD)に達した場合にMulticast通信に切り替える）multicastThresholdに達した場合、MulticastIPを通知する
+- IPv4 or IPv6 Multicast Option：（購読数が閾値に達した場合にMulticast通信に切り替える）multicastThresholdに達した場合、MulticastIPを通知する
 
-- イベントを送信するトランスポート[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)（Multicastを使用する場合は[UDP](https://d.hatena.ne.jp/keyword/UDP)）
+- イベントを送信するトランスポートプロトコル（Multicastを使用する場合はUDP）
 
-- Multicastをする場合は、IGMPメッセージの送信があってから送られるのだろうか、、、そしたら[スループット](https://d.hatena.ne.jp/keyword/%A5%B9%A5%EB%A1%BC%A5%D7%A5%C3%A5%C8)大きそう
+- Multicastをする場合は、IGMPメッセージの送信があってから送られるのだろうか、、、そしたらスループット大きそう
 
 ###### [SWS_CM_00208] SOME/IP SubscribeEventgroupNack message
 
 - SubscribeをNACKする場合に送信
 
-- SubscribeEventgroupACK メッセージのエントリと同様だが、[TTL](https://d.hatena.ne.jp/keyword/TTL)は0x000000に設定
+- SubscribeEventgroupACK メッセージのエントリと同様だが、TTLは0x000000に設定
 
 ###### [SWS_CM_10378] Sending SOME/IP StopSubscribeEventgroup messages
 
@@ -187,13 +187,13 @@ image: ""
 
 ###### [SWS_CM_00207] Content of SOME/IP StopSubscribeEventgroup message
 
-- これもSubscribeEventgroupメッセージの[TTL](https://d.hatena.ne.jp/keyword/TTL)を０にする
+- これもSubscribeEventgroupメッセージのTTLを０にする
 
 ##### 7.8.1.2 Accumulation of SOME/IP messages
 
 ###### [SWS_CM_10387] Data accumulation for UDP data transmission
 
-- 1つの[UDP](https://d.hatena.ne.jp/keyword/UDP)データグラムにSOME/IPのイベントやメソッドを蓄積する機能をサポートする
+- 1つのUDPデータグラムにSOME/IPのイベントやメソッドを蓄積する機能をサポートする
 
 ###### [SWS_CM_10388] Enabling of data accumulation for UDP data transmission
 
@@ -211,7 +211,7 @@ SomeipServiceInstanceToMachineMapping.udpCollectionBufferSizeThresholdに値が�
 
 - この節以降では、「受信時（upon reception）」という用語を、以下のような意味で使用：
 
-- SOME/IPメッセージを受信してから、該当[API](https://d.hatena.ne.jp/keyword/API)（例：Event::GetNewSamples()）が呼び出されるまでのどこかのタイミングで、[ペイロード](https://d.hatena.ne.jp/keyword/%A5%DA%A5%A4%A5%ED%A1%BC%A5%C9)のデ[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)といった処理が非同期に行われる可能性があるということ
+- SOME/IPメッセージを受信してから、該当API（例：Event::GetNewSamples()）が呼び出されるまでのどこかのタイミングで、ペイロードのデシリアライズといった処理が非同期に行われる可能性があるということ
 
 ###### [SWS_CM_11270]DRAFTSelecting elements of the ServiceInterface for SecOC transmission
 
@@ -227,13 +227,13 @@ SomeipServiceInstanceToMachineMapping.udpCollectionBufferSizeThresholdに値が�
 
 ###### [SWS_CM_10288] Transport protocol for sending of a SOME/IP event message
 
-- [閾値](https://d.hatena.ne.jp/keyword/%EF%E7%C3%CD)に達する前は、SomeipServiceInterfaceDeployment.eventDeployment.trans
+- 閾値に達する前は、SomeipServiceInterfaceDeployment.eventDeployment.trans
 
-portProtocolに記載のトランスポート[プロトコル](https://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB)を使用してイベントメッセージを送信
+portProtocolに記載のトランスポートプロトコルを使用してイベントメッセージを送信
 
 -
 
-multicastThresholdに達した場合は、multicstになるので[UDP](https://d.hatena.ne.jp/keyword/UDP)となる
+multicastThresholdに達した場合は、multicstになるのでUDPとなる
 
 ###### [SWS_CM_10289] Source of a SOME/IP event message
 
@@ -241,9 +241,9 @@ multicastThresholdに達した場合は、multicstになるので[UDP](https://d
 
 ###### [SWS_CM_10290] Destination of a SOME/IP event message
 
-- multicastThresholdに達した場合は、SubscribeEventgroupAckメッセージに含まれるMulticstIPおよびポートを[送信先](https://d.hatena.ne.jp/keyword/%C1%F7%BF%AE%C0%E8)に使用する
+- multicastThresholdに達した場合は、SubscribeEventgroupAckメッセージに含まれるMulticstIPおよびポートを送信先に使用する
 
-- [閾値](https://d.hatena.ne.jp/keyword/%EF%E7%C3%CD)に達していない場合は、SubscribeEventgroup メッセージに含まれるIPおよびポートに送信する
+- 閾値に達していない場合は、SubscribeEventgroup メッセージに含まれるIPおよびポートに送信する
 
 ###### [SWS_CM_10291] Content of the SOME/IP event message
 
@@ -287,7 +287,7 @@ multicastThresholdに達した場合は、multicstになるので[UDP](https://d
 
 ###### [SWS_CM_10295] Providing the received event data
 
-- デ[シリアライズ](https://d.hatena.ne.jp/keyword/%A5%B7%A5%EA%A5%A2%A5%E9%A5%A4%A5%BA)されたEventは、アプリのEventクラスのGetNewSamples()メソッドを使用してデータにアクセスする
+- デシリアライズされたEventは、アプリのEventクラスのGetNewSamples()メソッドを使用してデータにアクセスする
 
 - ハンドラを使用した場合、ハンドラ内にGetNewSamples()を実装していた場合は、Event受信時にデータを取得しにいく
 

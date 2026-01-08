@@ -14,6 +14,7 @@ import TableOfContents from "@/components/TableOfContents";
 import ShareButtons from "@/components/ShareButtons";
 import PostCard from "@/components/PostCard";
 import Sidebar from "@/components/Sidebar";
+import { slug as slugify } from "github-slugger";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -122,7 +123,26 @@ export default async function PostPage({ params }: Props) {
 
             {/* 本文 */}
             <div className="prose prose-lg max-w-none">
-              <MDXRemote source={post.content} />
+              <MDXRemote
+                source={post.content}
+                components={{
+                  h2: ({ children }) => {
+                    const text = String(children);
+                    const id = slugify(text);
+                    return <h2 id={id}>{children}</h2>;
+                  },
+                  h3: ({ children }) => {
+                    const text = String(children);
+                    const id = slugify(text);
+                    return <h3 id={id}>{children}</h3>;
+                  },
+                  h4: ({ children }) => {
+                    const text = String(children);
+                    const id = slugify(text);
+                    return <h4 id={id}>{children}</h4>;
+                  },
+                }}
+              />
             </div>
 
             {/* シェアボタン */}
