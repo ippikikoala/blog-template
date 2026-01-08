@@ -70,7 +70,7 @@
 - [x] GitHubにプッシュ
 - [x] Vercelデプロイ（自動デプロイ有効）
 - [x] サイト動作確認
-- [ ] 独自ドメイン取得・設定（オプション）
+- [x] 独自ドメイン取得・設定（ippikikoala.com）
 - [ ] Vercel Analytics有効化（オプション）
 - [ ] はてなブログからの誘導設定（オプション）
 
@@ -80,9 +80,11 @@
 
 | 項目 | URL/情報 |
 |------|----------|
-| **本番サイト** | https://ippikikoala-blog.vercel.app |
+| **本番サイト** | https://ippikikoala.com |
+| **Vercel URL** | https://ippikikoala-blog.vercel.app |
 | **GitHubリポジトリ** | https://github.com/ippikikoala/blog-template |
 | **画像ホスティング** | https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev |
+| **ドメイン** | ippikikoala.com（お名前.com） |
 | **記事数** | 139記事 |
 | **画像数** | 3,238枚 |
 
@@ -92,13 +94,8 @@
 
 ### 優先度：中
 
-1. **独自ドメイン設定**
-   - ドメイン取得
-   - VercelでDNS設定
-   → [05-infrastructure.md](./05-infrastructure.md) 参照
-
-2. **Vercel Analytics有効化**
+1. **Vercel Analytics有効化**
    - Vercelダッシュボードで有効化
 
-3. **はてなブログからの誘導設定**
+2. **はてなブログからの誘導設定**
    - 旧ブログにリダイレクト案内を追加

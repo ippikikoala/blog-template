@@ -4,10 +4,11 @@
 
 | サービス | ステータス | URL/情報 |
 |---------|----------|----------|
+| **本番サイト** | ✅ 稼働中 | https://ippikikoala.com |
 | **Vercel** | ✅ 稼働中 | https://ippikikoala-blog.vercel.app |
 | **GitHub** | ✅ 連携済み | https://github.com/ippikikoala/blog-template |
 | **Cloudflare R2** | ✅ 稼働中 | https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev |
-| **独自ドメイン** | ⏳ 未設定 | - |
+| **独自ドメイン** | ✅ 設定済み | ippikikoala.com（お名前.com） |
 
 ---
 
@@ -17,9 +18,9 @@
 |---------|------|------|
 | Vercel | サイトホスティング | 無料 |
 | Cloudflare R2 | 画像ストレージ | 無料〜 |
-| 独自ドメイン | ドメイン | 約100円/月（オプション） |
+| お名前.com | ドメイン（ippikikoala.com） | 約1,500円/年 |
 
-**現在の月額**: 0円（独自ドメインなし）
+**現在の月額**: 約125円（ドメイン費用のみ）
 
 ---
 
@@ -27,7 +28,8 @@
 
 ### 本番環境
 
-- **URL**: https://ippikikoala-blog.vercel.app
+- **本番URL**: https://ippikikoala.com
+- **Vercel URL**: https://ippikikoala-blog.vercel.app
 - **GitHub連携**: ippikikoala/blog-template
 - **自動デプロイ**: ✅ 有効（mainブランチへのpush時）
 
@@ -97,22 +99,30 @@ const nextConfig = {
 };
 ```
 
-## ドメイン設定
+## ドメイン設定 ✅ 設定済み
 
-### Vercel + 独自ドメイン
+### 現在の設定
 
-1. ドメインを取得（お名前.com、Cloudflare等）
-2. VercelダッシュボードでドメインをAdd
-3. DNSレコードを設定（A or CNAME）
-4. SSL自動発行
+- **ドメイン**: ippikikoala.com
+- **レジストラ**: お名前.com
+- **DNS**: お名前.com DNS (01.dnsv.jp / 02.dnsv.jp / 03.dnsv.jp / 04.dnsv.jp)
+- **SSL**: Vercel自動発行 ✅
 
-### DNS設定例
+### DNS設定内容
 
-```
-タイプ: CNAME
-名前: @（または www）
-値: cname.vercel-dns.com
-```
+| タイプ | ホスト名 | VALUE | TTL |
+|--------|---------|-------|-----|
+| A | @ | 216.198.79.1 | 3600 |
+| CNAME | www | e78c804622777ab1.vercel-dns-017.com. | 3600 |
+
+### 設定手順（記録用）
+
+1. お名前.comでドメイン取得（Whois情報公開代行を有効化）
+2. Vercelダッシュボード → Settings → Domains → Add Domain
+3. お名前.com Navi → DNS設定/転送設定 → DNSレコード設定
+4. 上記のAレコード・CNAMEレコードを追加
+5. DNS反映待ち（15分〜1時間）
+6. SSL証明書自動発行確認
 
 ## CI/CD
 
@@ -189,9 +199,10 @@ npm run build
 - [x] GitHubにプッシュ
 - [x] Vercelデプロイ
 - [x] サイト動作確認
-- [ ] 独自ドメイン設定（オプション）
+- [x] 独自ドメイン設定（ippikikoala.com）
 - [ ] 旧URLリダイレクト設定（オプション）
 
 ### Phase 4: 運用開始 ⏳ 進行中
+- [ ] Vercel Analytics有効化（オプション）
 - [ ] 旧ブログからの誘導
 - [x] 新規記事投稿可能
