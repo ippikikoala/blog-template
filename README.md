@@ -2,6 +2,14 @@
 
 鄙びた集落・旅館・廃線・温泉を巡る旅行記ブログ
 
+## 本番環境
+
+| 項目 | URL |
+|------|-----|
+| **サイト** | https://ippikikoala-blog.vercel.app |
+| **リポジトリ** | https://github.com/ippikikoala/blog-template |
+| **画像** | Cloudflare R2 |
+
 ## ドキュメント
 
 詳細な仕様は `docs/` フォルダを参照：
@@ -69,4 +77,4 @@ docs/                # 仕様書
 
 ## ライセンス
 
-© 2025 いっぴきこあらの大冒険. All rights reserved.
+© 2026 いっぴきこあらの大冒険. All rights reserved.

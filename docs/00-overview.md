@@ -51,10 +51,13 @@
 - [x] R2バケット作成（ippikikoala-blog）
 - [x] 公開URL設定（pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev）
 - [x] Next.js Image設定（next.config.ts）
+- [x] 画像アップロード完了（3,238枚）
 
 ### Phase 3: GitHub連携 ✅ 完了
 - [x] GitHubリポジトリ作成（ippikikoala/blog-template）
 - [x] ローカルリポジトリ連携
+- [x] SSH鍵設定
+- [x] 画像ファイルを.gitignoreに追加（リポジトリ軽量化）
 
 ### Phase 4: コンテンツ移行 ✅ 完了（2026年1月7日）
 - [x] はてなブログからエクスポート
@@ -63,28 +66,39 @@
 - [x] MDX形式へ変換（139記事）
 - [x] 全記事の動作確認
 
-### Phase 5: 本番公開 ⏳ 進行中
-- [ ] Vercelデプロイ
-- [ ] 独自ドメイン取得・設定
-- [ ] Vercel Analytics有効化
-- [ ] はてなブログからの誘導設定
+### Phase 5: 本番公開 ✅ 完了（2026年1月8日）
+- [x] GitHubにプッシュ
+- [x] Vercelデプロイ（自動デプロイ有効）
+- [x] サイト動作確認
+- [ ] 独自ドメイン取得・設定（オプション）
+- [ ] Vercel Analytics有効化（オプション）
+- [ ] はてなブログからの誘導設定（オプション）
 
-## 次に必要なアクション
+---
 
-### 優先度：最高
+## 本番環境情報
 
-1. **Vercelデプロイ**（最優先）
-   - GitHubにプッシュ
-   - Vercelでリポジトリをインポート
-   - 自動デプロイ確認
-   → [05-infrastructure.md](./05-infrastructure.md) 参照
+| 項目 | URL/情報 |
+|------|----------|
+| **本番サイト** | https://ippikikoala-blog.vercel.app |
+| **GitHubリポジトリ** | https://github.com/ippikikoala/blog-template |
+| **画像ホスティング** | https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev |
+| **記事数** | 139記事 |
+| **画像数** | 3,238枚 |
+
+---
+
+## 次に必要なアクション（オプション）
 
 ### 優先度：中
 
-2. **独自ドメイン**（オプション）
+1. **独自ドメイン設定**
    - ドメイン取得
-   - DNS設定
+   - VercelでDNS設定
+   → [05-infrastructure.md](./05-infrastructure.md) 参照
 
-3. **Vercel Analytics有効化**（オプション）
+2. **Vercel Analytics有効化**
+   - Vercelダッシュボードで有効化
 
-4. **はてなブログからの誘導設定**
+3. **はてなブログからの誘導設定**
+   - 旧ブログにリダイレクト案内を追加
