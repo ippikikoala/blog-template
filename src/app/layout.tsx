@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -54,6 +55,7 @@ export default function RootLayout({
         <Footer />
         <ScrollToTop />
         <Lightbox />
+        <Analytics />
       </body>
     </html>
   );
