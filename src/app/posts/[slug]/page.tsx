@@ -15,6 +15,8 @@ import ShareButtons from "@/components/ShareButtons";
 import PostCard from "@/components/PostCard";
 import Sidebar from "@/components/Sidebar";
 import { slug as slugify } from "github-slugger";
+import YouTube from "@/components/embeds/YouTube";
+import GoogleMap from "@/components/embeds/GoogleMap";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -141,6 +143,8 @@ export default async function PostPage({ params }: Props) {
                     const id = slugify(text);
                     return <h4 id={id}>{children}</h4>;
                   },
+                  YouTube,
+                  GoogleMap,
                 }}
               />
             </div>

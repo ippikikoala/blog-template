@@ -71,34 +71,64 @@
 - 移行時にタグ情報が失われ `tags: []` になっている
 
 ### 対応
-- [ ] 元のHatenaブログエクスポートデータを確認
-- [ ] タグ復元スクリプト作成
-- [ ] 全記事のfrontmatterにタグを追加
-- [ ] 動作確認（タグページ、記事詳細ページ）
+- [x] 元のHatenaブログエクスポートデータを確認
+- [x] タグ復元スクリプト作成 (`scripts/restore_tags.py`)
+- [x] 全記事のfrontmatterにタグを追加（44ファイル更新）
+- [x] 動作確認（タグページ、記事詳細ページ）
 
 **優先度**: 中
 **対象**: `content/posts/*.mdx`
+**スクリプト**: `scripts/restore_tags.py`
+**ステータス**: ✅ 完了
+
+### 補足
+- Hatenaブログエクスポートの`CATEGORY`フィールドを解析
+- 最初のCATEGORYはcategory（既存）、2番目以降をtagsとして復元
+- 44件のファイルにタグを追加（82件はタグなし記事）
+- 復元されたタグ: 廃線(9), 炭鉱(8), IT(6), ロードバイク(6), 旅館(5), 島(4), 温泉(2), 機材(2), 他
 
 ---
 
-## 5. Google Maps埋め込みの修正
+## 5. iframe埋め込みの実装
 
 ### 問題点
-- `[Google Maps埋め込み]` というプレースホルダーのまま
+- `[Google Maps埋め込み]` プレースホルダーのまま（14記事）
+- YouTube埋め込みが欠落（77件）
 
 ### 対応
-- [ ] Google Maps埋め込みがある記事を特定
-  ```bash
-  grep -r "Google Maps埋め込み" content/posts/
-  ```
-- [ ] 各記事に正しいGoogle Maps iframeコードを追加
-- [ ] next.config.ts に Google Maps ドメインを追加（必要に応じて）
-- [ ] 表示確認
+- [x] YouTube埋め込みコンポーネント作成（`src/components/embeds/YouTube.tsx`）
+- [x] Google Maps埋め込みコンポーネント作成（`src/components/embeds/GoogleMap.tsx`）
+- [x] MDXRemoteコンポーネント設定更新（`src/app/posts/[slug]/page.tsx`）
+- [x] iframe情報抽出スクリプト作成（`scripts/extract_iframes.py`）
+  - YouTube: 77件検出
+  - Google Maps: 33件検出
+  - 対象記事: 31件
+- [x] 更新ガイド生成スクリプト作成（`scripts/update_mdx_iframes.py`）
+- [x] 更新ガイド生成（`iframe_update_guide.md`）
+- [x] ビルド確認（エラーなし）
+- [ ] 31記事のMDXファイル手動更新
+  - [x] サンプル記事1件更新完了（2025-12-28-174758.mdx）
+  - [ ] 残り30記事の更新
+- [ ] 全埋め込みの表示確認（ブラウザ確認）
 
-**優先度**: 中
-**ファイル**:
-- 該当する `content/posts/*.mdx`
-- `next.config.ts`（必要に応じて）
+**優先度**: 高
+**ステータス**: 進行中（基盤完成、記事更新待ち）
+
+**実装完了ファイル**:
+- `src/components/embeds/YouTube.tsx` - YouTubeコンポーネント
+- `src/components/embeds/GoogleMap.tsx` - Google Mapsコンポーネント
+- `src/app/posts/[slug]/page.tsx` - MDXRemote設定更新
+- `scripts/extract_iframes.py` - iframe情報抽出スクリプト
+- `scripts/update_mdx_iframes.py` - 更新ガイド生成スクリプト
+- `iframe_mapping.json` - 抽出結果
+- `iframe_update_guide.md` - 手動更新用ガイド
+
+**次のステップ**:
+1. `iframe_update_guide.md` を参照しながら残り30記事を手動更新
+2. 各記事を `npm run dev` で表示確認
+3. YouTube動画の再生確認
+4. Google Mapsの操作確認（ドラッグ、ズーム）
+5. レスポンシブ表示確認
 
 ---
 
@@ -131,9 +161,9 @@
 
 ## 進捗管理
 
-- **完了**: 3/7
-- **進行中**: 0/7
-- **未着手**: 4/7
+- **完了**: 4/7
+- **進行中**: 1/7（iframe埋め込みの実装）
+- **未着手**: 2/7
 
 ---
 
