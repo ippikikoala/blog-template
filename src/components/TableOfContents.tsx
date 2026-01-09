@@ -11,7 +11,7 @@ interface TableOfContentsProps {
 }
 
 function generateToc(content: string): TocItem[] {
-  const headingRegex = /^(#{2,4})\s+(.+)$/gm;
+  const headingRegex = /^(#{2,6})\s+(.+)$/gm;
   const toc: TocItem[] = [];
   let match;
 

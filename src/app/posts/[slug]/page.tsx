@@ -143,6 +143,16 @@ export default async function PostPage({ params }: Props) {
                     const id = slugify(text);
                     return <h4 id={id}>{children}</h4>;
                   },
+                  h5: ({ children }) => {
+                    const text = String(children);
+                    const id = slugify(text);
+                    return <h5 id={id}>{children}</h5>;
+                  },
+                  h6: ({ children }) => {
+                    const text = String(children);
+                    const id = slugify(text);
+                    return <h6 id={id}>{children}</h6>;
+                  },
                   YouTube,
                   GoogleMap,
                 }}

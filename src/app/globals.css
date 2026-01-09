@@ -170,18 +170,53 @@ a:hover {
 .toc-list a {
   color: var(--foreground-muted);
   font-size: 14px;
+  display: block;
+  line-height: 1.6;
 }
 
 .toc-list a:hover {
   color: var(--color-accent);
 }
 
+/* h2: 大見出し（インデントなし） */
+.toc-list .toc-h2 a {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--foreground);
+}
+
+/* h3: 中見出し（1段階インデント） */
 .toc-list .toc-h3 {
   padding-left: 16px;
 }
 
-.toc-list .toc-h4 {
+.toc-list .toc-h3 a {
+  font-size: 14px;
+}
+
+/* h4: 小見出し（インデントなし、h3と並列） */
+.toc-list .toc-h4 a {
+  font-size: 14px;
+}
+
+/* h5: より小さい見出し（1段階インデント） */
+.toc-list .toc-h5 {
+  padding-left: 16px;
+}
+
+.toc-list .toc-h5 a {
+  font-size: 13px;
+  color: var(--foreground-subtle);
+}
+
+/* h6: 最小見出し（2段階インデント） */
+.toc-list .toc-h6 {
   padding-left: 32px;
+}
+
+.toc-list .toc-h6 a {
+  font-size: 12px;
+  color: var(--foreground-subtle);
 }
 
 /* Lightbox */
