@@ -63,16 +63,52 @@ image: "/images/xxx.jpg"
 ## 見出し
 
 本文...
+
+## iframe埋め込み
+
+YouTube動画やGoogle Mapsを埋め込む場合：
+
+<YouTube id="動画ID" title="動画タイトル" />
+
+<GoogleMap
+  src="https://www.google.com/maps/embed?pb=..."
+  title="場所名"
+/>
 ```
 
 ## プロジェクト構成
 
 ```
-content/posts/       # MDX記事
-src/app/             # App Routerページ
-src/components/      # UIコンポーネント
-src/lib/posts.ts     # 記事読み込み処理
-docs/                # 仕様書
+content/posts/            # MDX記事
+src/app/                  # App Routerページ
+src/components/           # UIコンポーネント
+  └── embeds/             # iframe埋め込みコンポーネント
+      ├── YouTube.tsx     # YouTube埋め込み
+      └── GoogleMap.tsx   # Google Maps埋め込み
+src/lib/posts.ts          # 記事読み込み処理
+scripts/                  # ユーティリティスクリプト
+  ├── extract_iframes.py        # iframe情報抽出
+  ├── update_mdx_iframes.py     # 更新ガイド生成
+  └── auto_update_iframes.py    # Google Maps自動更新
+docs/                     # 仕様書
+```
+
+## ユーティリティスクリプト
+
+### iframe埋め込み関連
+
+```bash
+# iframe情報をはてなブログエクスポートから抽出
+python3 scripts/extract_iframes.py
+
+# 更新ガイド生成
+python3 scripts/update_mdx_iframes.py
+
+# Google Mapsを自動更新（ドライラン）
+python3 scripts/auto_update_iframes.py --dry-run
+
+# Google Mapsを自動更新（実行）
+python3 scripts/auto_update_iframes.py
 ```
 
 ## ライセンス
