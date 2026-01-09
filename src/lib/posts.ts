@@ -12,11 +12,15 @@ export interface PostMeta {
   category?: string;
   tags?: string[];
   image?: string;
+  draft?: boolean;
 }
 
 export interface Post extends PostMeta {
   content: string;
 }
+
+// 本番環境かどうかを判定
+const isProduction = process.env.NODE_ENV === "production";
 
 export function getAllPosts(): PostMeta[] {
   if (!fs.existsSync(postsDirectory)) {
@@ -40,8 +44,11 @@ export function getAllPosts(): PostMeta[] {
         category: data.category || "",
         tags: data.tags || [],
         image: data.image || "",
+        draft: data.draft === true,
       };
     })
+    // 本番環境では下書きを除外
+    .filter((post) => !isProduction || !post.draft)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 
   return posts;
@@ -63,6 +70,11 @@ export function getPostBySlug(slug: string): Post | null {
   const fileContents = fs.readFileSync(fullPath, "utf8");
   const { data, content } = matter(fileContents);
 
+  // 本番環境で下書きの場合はnullを返す（直接URLアクセス防止）
+  if (isProduction && data.draft === true) {
+    return null;
+  }
+
   return {
     slug,
     title: data.title || slug,
@@ -71,6 +83,7 @@ export function getPostBySlug(slug: string): Post | null {
     category: data.category || "",
     tags: data.tags || [],
     image: data.image || "",
+    draft: data.draft === true,
     content,
   };
 }
@@ -80,10 +93,8 @@ export function getAllSlugs(): string[] {
     return [];
   }
 
-  return fs
-    .readdirSync(postsDirectory)
-    .filter((name) => name.endsWith(".mdx") || name.endsWith(".md"))
-    .map((name) => name.replace(/\.mdx?$/, ""));
+  // 本番環境では下書きのslugを除外（静的生成防止）
+  return getAllPosts().map((post) => post.slug);
 }
 
 export function getPostsByCategory(category: string): PostMeta[] {
@@ -93,6 +104,20 @@ export function getPostsByCategory(category: string): PostMeta[] {
 export function getPostsByTag(tag: string): PostMeta[] {
   return getAllPosts().filter((post) => post.tags?.includes(tag));
 }
+
+// 都道府県の北から南順（JISコード順）
+const PREFECTURE_ORDER: string[] = [
+  "北海道",
+  "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
+  "岐阜県", "静岡県", "愛知県", "三重県",
+  "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
+  "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+  "徳島県", "香川県", "愛媛県", "高知県",
+  "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
+  "その他", // 最後に表示
+];
 
 export function getAllCategories(): { name: string; count: number }[] {
   const posts = getAllPosts();
@@ -108,7 +133,14 @@ export function getAllCategories(): { name: string; count: number }[] {
 
   return Object.entries(categories)
     .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count);
+    .sort((a, b) => {
+      const indexA = PREFECTURE_ORDER.indexOf(a.name);
+      const indexB = PREFECTURE_ORDER.indexOf(b.name);
+      // リストにない場合は「その他」の前に配置
+      const orderA = indexA === -1 ? PREFECTURE_ORDER.length - 1 : indexA;
+      const orderB = indexB === -1 ? PREFECTURE_ORDER.length - 1 : indexB;
+      return orderA - orderB;
+    });
 }
 
 export function getAllTags(): { name: string; count: number }[] {
