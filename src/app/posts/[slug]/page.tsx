@@ -7,6 +7,7 @@ import {
   getRelatedPosts,
   getAdjacentPosts,
 } from "@/lib/posts";
+import { normalizeCategory } from "@/lib/categoryUtils";
 import { format } from "date-fns";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { Metadata } from "next";
@@ -58,6 +59,7 @@ export default async function PostPage({ params }: Props) {
 
   const relatedPosts = getRelatedPosts(slug, post.category, post.tags);
   const { prev, next } = getAdjacentPosts(slug);
+  const categories = normalizeCategory(post.category);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -67,14 +69,19 @@ export default async function PostPage({ params }: Props) {
           <article className="card p-6 md:p-10">
             {/* ヘッダー */}
             <header className="mb-8">
-              {/* カテゴリ */}
-              {post.category && (
-                <Link
-                  href={`/categories/${encodeURIComponent(post.category)}`}
-                  className="category mb-3 inline-block"
-                >
-                  {post.category}
-                </Link>
+              {/* カテゴリ（複数対応） */}
+              {categories.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Link
+                      key={category}
+                      href={`/categories/${encodeURIComponent(category)}`}
+                      className="category"
+                    >
+                      {category}
+                    </Link>
+                  ))}
+                </div>
               )}
 
               {/* タイトル */}

@@ -32,6 +32,7 @@
 - [07-mobile-editing.md](./07-mobile-editing.md) - スマホ編集環境
 - [08-cloudflare-r2.md](./08-cloudflare-r2.md) - Cloudflare R2セットアップ
 - [09-migration-guide.md](./09-migration-guide.md) - はてなブログからの移行ガイド
+- [10-category-hierarchy.md](./10-category-hierarchy.md) - カテゴリ階層構造仕様
 
 ## 実装状況
 
@@ -73,6 +74,14 @@
 - [x] 独自ドメイン取得・設定（ippikikoala.com）
 - [ ] Vercel Analytics有効化（オプション）
 - [ ] はてなブログからの誘導設定（オプション）
+
+### Phase 6: カテゴリ階層化 ✅ 完了（2026年1月10日）
+- [x] 設定ファイルベースのカテゴリ管理（src/config/categories.ts）
+- [x] 地方別階層表示（8地方区分）
+- [x] 複数カテゴリ対応（配列形式サポート）
+- [x] サイドバーUI更新（地方ごとにグループ化）
+- [x] 重複カウント機能
+- [x] ドキュメント作成（10-category-hierarchy.md）
 
 ---
 

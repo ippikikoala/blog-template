@@ -2,12 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
 import type { PostMeta } from "@/lib/posts";
+import { normalizeCategory } from "@/lib/categoryUtils";
 
 interface PostCardProps {
   post: PostMeta;
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const categories = normalizeCategory(post.category);
+
   return (
     <article className="card overflow-hidden">
       <Link href={`/posts/${post.slug}`} className="block group">
@@ -30,9 +33,15 @@ export default function PostCard({ post }: PostCardProps) {
 
         {/* コンテンツ */}
         <div className="p-4">
-          {/* カテゴリ */}
-          {post.category && (
-            <span className="category text-[10px] mb-2">{post.category}</span>
+          {/* カテゴリ（複数対応） */}
+          {categories.length > 0 && (
+            <div className="mb-2 flex flex-wrap gap-1">
+              {categories.map((category) => (
+                <span key={category} className="category text-[10px]">
+                  {category}
+                </span>
+              ))}
+            </div>
           )}
 
           {/* タイトル */}

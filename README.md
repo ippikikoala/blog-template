@@ -24,6 +24,7 @@
 - [スマホ編集](docs/07-mobile-editing.md) - GitHub Mobileでの編集方法
 - [Cloudflare R2](docs/08-cloudflare-r2.md) - 画像ホスティング設定
 - [移行ガイド](docs/09-migration-guide.md) - はてなブログからの移行手順
+- [カテゴリ階層](docs/10-category-hierarchy.md) - カテゴリ階層構造・複数カテゴリ対応
 
 ## 開発環境
 
@@ -55,7 +56,8 @@ npm run lint     # Lint
 title: "記事タイトル"
 date: "2025-01-05"
 description: "記事の説明"
-category: "北海道"
+category: "北海道"              # 単一カテゴリ
+# category: ["熊本県", "宮崎県"] # 複数カテゴリも可能
 tags: ["温泉", "秘湯"]
 image: "/images/xxx.jpg"
 ---
@@ -85,7 +87,11 @@ src/components/           # UIコンポーネント
   └── embeds/             # iframe埋め込みコンポーネント
       ├── YouTube.tsx     # YouTube埋め込み
       └── GoogleMap.tsx   # Google Maps埋め込み
-src/lib/posts.ts          # 記事読み込み処理
+src/config/               # 設定ファイル
+  └── categories.ts       # カテゴリ階層構造定義
+src/lib/
+  ├── posts.ts            # 記事読み込み処理
+  └── categoryUtils.ts    # カテゴリユーティリティ
 scripts/                  # ユーティリティスクリプト
   ├── extract_iframes.py        # iframe情報抽出
   ├── update_mdx_iframes.py     # 更新ガイド生成

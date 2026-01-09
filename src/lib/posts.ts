@@ -1,6 +1,12 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import {
+  normalizeCategory,
+  getCategoryOrder,
+  getAllRegions,
+} from "@/lib/categoryUtils";
+import type { Region } from "@/config/categories";
 
 const postsDirectory = path.join(process.cwd(), "content/posts");
 
@@ -9,7 +15,7 @@ export interface PostMeta {
   title: string;
   date: string;
   description: string;
-  category?: string;
+  category?: string | string[]; // 単一または複数カテゴリ対応
   tags?: string[];
   image?: string;
   draft?: boolean;
@@ -98,48 +104,49 @@ export function getAllSlugs(): string[] {
 }
 
 export function getPostsByCategory(category: string): PostMeta[] {
-  return getAllPosts().filter((post) => post.category === category);
+  return getAllPosts().filter((post) => {
+    const categories = normalizeCategory(post.category);
+    return categories.includes(category);
+  });
 }
 
 export function getPostsByTag(tag: string): PostMeta[] {
   return getAllPosts().filter((post) => post.tags?.includes(tag));
 }
 
-// 都道府県の北から南順（JISコード順）
-const PREFECTURE_ORDER: string[] = [
-  "北海道",
-  "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-  "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-  "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
-  "岐阜県", "静岡県", "愛知県", "三重県",
-  "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
-  "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-  "徳島県", "香川県", "愛媛県", "高知県",
-  "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県",
-  "その他", // 最後に表示
-];
-
+/**
+ * すべてのカテゴリ（都道府県）を記事数とともに取得
+ * 複数カテゴリ記事は各カテゴリで重複カウントされる
+ * @returns カテゴリ名と記事数の配列（設定ファイルの順序でソート）
+ */
 export function getAllCategories(): { name: string; count: number }[] {
   const posts = getAllPosts();
-  const categories = posts.reduce(
-    (acc, post) => {
-      if (post.category) {
-        acc[post.category] = (acc[post.category] || 0) + 1;
-      }
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const categoryCounts: Record<string, number> = {};
 
-  return Object.entries(categories)
+  // 複数カテゴリ対応: 各カテゴリで重複カウント
+  posts.forEach((post) => {
+    const categories = normalizeCategory(post.category);
+    categories.forEach((category) => {
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+  });
+
+  // 設定ファイルの順序でソート
+  return Object.entries(categoryCounts)
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => {
-      const indexA = PREFECTURE_ORDER.indexOf(a.name);
-      const indexB = PREFECTURE_ORDER.indexOf(b.name);
-      // リストにない場合は「その他」の前に配置
-      const orderA = indexA === -1 ? PREFECTURE_ORDER.length - 1 : indexA;
-      const orderB = indexB === -1 ? PREFECTURE_ORDER.length - 1 : indexB;
-      return orderA - orderB;
+      const orderA = getCategoryOrder(a.name);
+      const orderB = getCategoryOrder(b.name);
+
+      // 設定にない都道府県は最後に配置
+      if (!orderA) return 1;
+      if (!orderB) return -1;
+
+      // 地方順 → 都道府県順でソート
+      if (orderA.regionOrder !== orderB.regionOrder) {
+        return orderA.regionOrder - orderB.regionOrder;
+      }
+      return orderA.prefectureOrder - orderB.prefectureOrder;
     });
 }
 
@@ -160,23 +167,78 @@ export function getAllTags(): { name: string; count: number }[] {
     .sort((a, b) => b.count - a.count);
 }
 
+/**
+ * 地方別にカテゴリ（都道府県）と記事数を取得
+ * サイドバーでの階層表示に使用
+ * @returns 地方ごとのカテゴリ情報
+ */
+export interface RegionWithCategories {
+  region: Region;
+  categories: { name: string; count: number }[];
+}
+
+export function getCategoriesByRegion(): RegionWithCategories[] {
+  const posts = getAllPosts();
+  const regions = getAllRegions();
+  const categoryCounts: Record<string, number> = {};
+
+  // 複数カテゴリ対応: 各カテゴリで重複カウント
+  posts.forEach((post) => {
+    const categories = normalizeCategory(post.category);
+    categories.forEach((category) => {
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+  });
+
+  // 地方ごとにグループ化
+  return regions
+    .map((region) => {
+      const categories = region.prefectures
+        .map((prefecture) => ({
+          name: prefecture.name,
+          count: categoryCounts[prefecture.name] || 0,
+        }))
+        .filter((cat) => cat.count > 0) // 記事が存在する都道府県のみ
+        .sort((a, b) => {
+          // 設定ファイルの順序でソート
+          const orderA = getCategoryOrder(a.name);
+          const orderB = getCategoryOrder(b.name);
+          if (!orderA || !orderB) return 0;
+          return orderA.prefectureOrder - orderB.prefectureOrder;
+        });
+
+      return { region, categories };
+    })
+    .filter((item) => item.categories.length > 0); // 記事が存在する地方のみ
+}
+
 export function getRelatedPosts(
   currentSlug: string,
-  category?: string,
+  category?: string | string[],
   tags?: string[],
   limit: number = 4
 ): PostMeta[] {
   const allPosts = getAllPosts().filter((post) => post.slug !== currentSlug);
+  const currentCategories = normalizeCategory(category);
 
   // スコア計算: 同じカテゴリ +2, 同じタグ +1
   const scoredPosts = allPosts.map((post) => {
     let score = 0;
-    if (category && post.category === category) {
+
+    // 複数カテゴリ対応: いずれか1つでもマッチすればスコア加算
+    const postCategories = normalizeCategory(post.category);
+    const hasCommonCategory = currentCategories.some((cat) =>
+      postCategories.includes(cat)
+    );
+    if (hasCommonCategory) {
       score += 2;
     }
+
+    // タグのスコア計算
     if (tags && post.tags) {
       score += tags.filter((tag) => post.tags?.includes(tag)).length;
     }
+
     return { post, score };
   });
 

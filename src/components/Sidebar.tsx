@@ -1,18 +1,11 @@
 import Link from "next/link";
-import { getAllPosts } from "@/lib/posts";
+import { getAllPosts, getCategoriesByRegion } from "@/lib/posts";
 
 export default function Sidebar() {
   const posts = getAllPosts();
 
-  // カテゴリ（都道府県）を集計
-  const categories = posts.reduce(
-    (acc, post) => {
-      const category = post.category || "未分類";
-      acc[category] = (acc[category] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  // 地方別のカテゴリ（都道府県）を取得
+  const regionCategories = getCategoriesByRegion();
 
   // タグを集計
   const tags = posts.reduce(
@@ -65,38 +58,38 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* カテゴリ */}
-      {Object.keys(categories).length > 0 && (
+      {/* カテゴリ（階層表示） */}
+      {regionCategories.length > 0 && (
         <div className="card p-6">
           <h3 className="font-bold text-lg mb-4 text-[var(--color-primary-dark)]">
             Categories
           </h3>
-          <ul className="space-y-2">
-            {Object.entries(categories)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 10)
-              .map(([category, count]) => (
-                <li key={category}>
-                  <Link
-                    href={`/categories/${encodeURIComponent(category)}`}
-                    className="flex justify-between text-sm text-[var(--foreground-muted)] hover:text-[var(--color-accent)]"
-                  >
-                    <span>{category}</span>
-                    <span className="text-[var(--foreground-subtle)]">
-                      ({count})
-                    </span>
-                  </Link>
-                </li>
-              ))}
-          </ul>
-          {Object.keys(categories).length > 10 && (
-            <Link
-              href="/categories"
-              className="block mt-4 text-sm text-[var(--color-accent)] hover:underline"
-            >
-              すべてのカテゴリを見る →
-            </Link>
-          )}
+          <div className="space-y-4">
+            {regionCategories.map(({ region, categories }) => (
+              <div key={region.id}>
+                {/* 地方名 */}
+                <div className="text-sm font-semibold text-[var(--color-primary-dark)] mb-2">
+                  {region.name}
+                </div>
+                {/* 都道府県リスト */}
+                <ul className="space-y-1 pl-3 border-l-2 border-[var(--background-secondary)]">
+                  {categories.map(({ name, count }) => (
+                    <li key={name}>
+                      <Link
+                        href={`/categories/${encodeURIComponent(name)}`}
+                        className="flex justify-between text-sm text-[var(--foreground-muted)] hover:text-[var(--color-accent)]"
+                      >
+                        <span>{name}</span>
+                        <span className="text-[var(--foreground-subtle)]">
+                          ({count})
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
