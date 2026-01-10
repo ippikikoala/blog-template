@@ -263,7 +263,66 @@
 
 ---
 
-## 10. その他の改善（オプション）
+## 10. スマホ版UIの改善
+
+### 問題点
+- **問題1**: トップページ（記事一覧）で目次の内容が表示されてしまう
+- **問題2**: ハンバーガーメニューを押しても何も表示されない（実機iPhone/Androidで確認）
+- **問題3**: 記事カード（一覧）に都道府県カテゴリバッジが表示されていない
+
+### 対応
+
+#### 問題1: 目次の誤表示
+- [ ] 目次が記事詳細ページ以外に表示されないことを確認
+- [ ] 必要に応じてトップページのレンダリングロジックを調査
+- [ ] 一覧画面で目次コンポーネントが呼ばれていないか確認
+
+**原因仮説**:
+- TableOfContentsは記事詳細ページ（`src/app/posts/[slug]/page.tsx`）でのみ使用されている
+- トップページ（`src/app/page.tsx`）では使用されていない
+- 別の原因（キャッシュ、ビルド成果物の問題等）の可能性あり
+
+#### 問題2: ハンバーガーメニューが開かない → **解決済み**
+- [x] `src/components/MobileMenu.tsx` のz-index設定を確認・修正
+- [x] React Portalを使ってbody直下にレンダリングする実装
+- [x] 実機での動作確認（iPhone/Android）
+
+**解決方法**: React Portalでbody直下にレンダリング + z-index調整
+
+#### 問題2-b: カテゴリ/タグリンクをクリックすると404エラー → **解決済み**
+- [x] `generateStaticParams`から`encodeURIComponent`を削除
+- [x] Next.js App Routerが自動的にURLエンコーディングを処理
+
+**原因**: `generateStaticParams`で`encodeURIComponent`を使用していたため、Next.jsの自動エンコーディングと競合していた
+
+**修正ファイル**:
+- `src/app/categories/[category]/page.tsx`
+- `src/app/tags/[tag]/page.tsx`
+
+#### 問題3: カテゴリバッジの表示改善
+- [ ] `src/components/PostCard.tsx` のカテゴリバッジフォントサイズを確認
+  - 現状: `text-[10px]` (非常に小さい)
+- [ ] モバイルでのフォントサイズを調整（最低12px推奨）
+- [ ] レスポンシブクラスを追加（`text-[10px] sm:text-xs`）
+- [ ] 実機での視認性確認
+
+**実装済み箇所**:
+- カテゴリバッジ自体は実装済み（[PostCard.tsx:36-45](src/components/PostCard.tsx#L36-L45)）
+- `normalizeCategory()` で複数カテゴリ対応済み
+
+**優先度**: 高
+**ファイル**:
+- `src/app/page.tsx` - トップページ（問題1の調査）
+- `src/components/MobileMenu.tsx` - ハンバーガーメニュー（解決済み）
+- `src/app/globals.css` - z-index設定（解決済み）
+- `src/app/categories/[category]/page.tsx` - カテゴリページ（解決済み）
+- `src/app/tags/[tag]/page.tsx` - タグページ（解決済み）
+- `src/components/PostCard.tsx` - カテゴリバッジ
+**ステータス**: 一部解決（問題2, 2-b完了 / 問題1, 3未着手）
+
+---
+
+## 11. その他の改善（オプション）
 
 - [ ] favicon追加 (`public/favicon.ico`)
 - [ ] OGP画像作成 (`public/og-image.png`)
@@ -274,9 +333,9 @@
 
 ## 進捗管理
 
-- **完了**: 9/10
-- **進行中**: 0/10
-- **未着手**: 1/10（オプションタスク）
+- **完了**: 9/11
+- **進行中**: 0/11
+- **未着手**: 2/11（#10スマホUI改善, #11オプションタスク）
 
 ---
 
@@ -285,7 +344,8 @@
 - 各タスク完了後はビルド & 動作確認を実施
 - 重要な変更後はgitコミット
 - 本番反映前にプレビュー環境で確認
+- スマホ実機での確認を優先（DevToolsだけでは再現しない問題あり）
 
 ---
 
-最終更新: 2026-01-09
+最終更新: 2026-01-10
