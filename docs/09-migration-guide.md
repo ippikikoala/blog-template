@@ -686,5 +686,77 @@ npm run build
 
 ---
 
-**最終更新**: 2026年1月7日
+## ステップ6: 記事クリーンアップ（移行後）
+
+移行後の記事には、はてなブログ由来のアーティファクト（目次パターン、キーワードリンクなど）が残っている場合があります。以下のスクリプトで一括クリーンアップできます。
+
+### 6-1. Hatenaキーワードリンク・TOCの削除
+
+`scripts/cleanup_mdx.py` を使用：
+
+```bash
+python3 scripts/cleanup_mdx.py
+```
+
+**処理内容**:
+- Hatenaキーワードリンク（`[text](http://d.hatena.ne.jp/keyword/...)`）をプレーンテキストに変換
+- 記事冒頭のTOCリンク（`[見出し](#anchor)`）を削除
+- description内のHatena URLを削除
+
+### 6-2. description内のTOCパターン修正
+
+`scripts/cleanup_description_toc.py` を使用：
+
+```bash
+# 問題のある記事を確認（修正せず）
+python3 scripts/cleanup_description_toc.py --check
+
+# ドライラン（変更内容を確認）
+python3 scripts/cleanup_description_toc.py --dry-run
+
+# 実際に修正
+python3 scripts/cleanup_description_toc.py
+```
+
+**処理内容**:
+- description内のTOCパターン（`見出し(アンカー) - 見出し(アンカー)`など）を検出
+- 問題があれば本文から最初の意味のある段落を抽出して置換
+
+**検出パターン**:
+1. `見出し(アンカー)` が2つ以上含まれる
+2. ` - 見出し(アンカー)` セパレータパターン
+3. `1日目` や `Part1` で始まりアンカーを含む
+4. `href=` を含む
+5. 括弧が閉じていない（`(incomplete-anchor` で終わる）
+
+**抽出ロジック**:
+- 見出し（`#`）をスキップ
+- 画像行をスキップ
+- キャプション（`_text_`）をスキップ
+- TOCリンクをスキップ
+- 最初の150文字程度を抽出（最大200文字）
+
+### 6-3. クリーンアップスクリプト一覧
+
+| スクリプト | 用途 | 実行タイミング |
+|-----------|------|---------------|
+| `cleanup_mdx.py` | Hatenaリンク・TOC削除 | 変換直後 |
+| `cleanup_description_toc.py` | description修正 | cleanup_mdx.py後 |
+| `remove_old_toc.py` | 古いTOCリンク削除 | 必要に応じて |
+| `fix_categories.py` | カテゴリ正規化 | 必要に応じて |
+| `restore_tags.py` | タグ復元 | 必要に応じて |
+
+### 6-4. クリーンアップ後の確認
+
+```bash
+# 開発サーバーで確認
+npm run dev
+
+# ビルドテスト
+npm run build
+```
+
+---
+
+**最終更新**: 2026年1月10日
 **テスト済み環境**: macOS, Python 3.11, Node.js 18, Next.js 16

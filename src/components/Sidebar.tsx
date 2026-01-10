@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getAllPosts, getCategoriesByRegion } from "@/lib/posts";
+import CategoryAccordion from "./CategoryAccordion";
 
 export default function Sidebar() {
   const posts = getAllPosts();
@@ -58,38 +59,13 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* カテゴリ（階層表示） */}
+      {/* カテゴリ（アコーディオン表示） */}
       {regionCategories.length > 0 && (
         <div className="card p-6">
           <h3 className="font-bold text-lg mb-4 text-[var(--color-primary-dark)]">
             Categories
           </h3>
-          <div className="space-y-4">
-            {regionCategories.map(({ region, categories }) => (
-              <div key={region.id}>
-                {/* 地方名 */}
-                <div className="text-sm font-semibold text-[var(--color-primary-dark)] mb-2">
-                  {region.name}
-                </div>
-                {/* 都道府県リスト */}
-                <ul className="space-y-1 pl-3 border-l-2 border-[var(--background-secondary)]">
-                  {categories.map(({ name, count }) => (
-                    <li key={name}>
-                      <Link
-                        href={`/categories/${encodeURIComponent(name)}`}
-                        className="flex justify-between text-sm text-[var(--foreground-muted)] hover:text-[var(--color-accent)]"
-                      >
-                        <span>{name}</span>
-                        <span className="text-[var(--foreground-subtle)]">
-                          ({count})
-                        </span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <CategoryAccordion regionCategories={regionCategories} />
         </div>
       )}
 
