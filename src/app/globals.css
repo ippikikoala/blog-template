@@ -299,7 +299,7 @@ a:hover {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 998;
+  z-index: 9998;
   animation: fadeIn 0.2s ease;
 }
 
@@ -309,8 +309,9 @@ a:hover {
   right: 0;
   bottom: 0;
   width: 280px;
+  max-width: 85vw;
   background: var(--background);
-  z-index: 999;
+  z-index: 9999;
   padding: 24px;
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.2s ease;
