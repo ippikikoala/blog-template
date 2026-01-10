@@ -11,7 +11,7 @@ interface Props {
 export async function generateStaticParams() {
   const categories = getAllCategories();
   return categories.map(({ name }) => ({
-    category: encodeURIComponent(name),
+    category: name,
   }));
 }
 

@@ -11,7 +11,7 @@ interface Props {
 export async function generateStaticParams() {
   const tags = getAllTags();
   return tags.map(({ name }) => ({
-    tag: encodeURIComponent(name),
+    tag: name,
   }));
 }
 
