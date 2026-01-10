@@ -52,7 +52,7 @@ export default function Footer() {
                   href="/tags"
                   className="text-sm text-[var(--foreground-muted)] hover:text-[var(--color-accent)]"
                 >
-                  タグ
+                  Tags
                 </Link>
               </li>
               <li>
