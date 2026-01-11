@@ -21,7 +21,7 @@ AUTOSARの悪口を見ていたら、vsomeipを使ってSOMEIP通信すること
 
 [https://www.reddit.com/r/embedded/comments/leq366/comment/gmiq6d0/](https://www.reddit.com/r/embedded/comments/leq366/comment/gmiq6d0/)
 
-#### SOMEIP通信とは
+## SOMEIP通信とは
 
 車載ソフトの規格団体であるAUTOSARによって策定された通信プロトコル。SOA（Service Orientied Archtecture）の思想のもとに策定されている。
 
@@ -31,7 +31,7 @@ Vectorの説明資料が一番わかり易いです：
 
 ここからは自分の感想になりますが、SOAというだけあり、システムを「Service」の集合体として扱うのが特徴です。
 
-##### SOA
+### SOA
 
 例えば、ECU1とECU2の通信を考えます。
 
@@ -97,7 +97,7 @@ SOMEIPにおいてServiceやIFを識別するために各種IDが使用されま
 
 - 提供するEventGroup・Eventを識別するためのID
 
-##### SOMEIP通信のシーケンス
+### SOMEIP通信のシーケンス
 
 ここに詳しく書かれていますが、、、ARP解決等はされている前提とします。
 
@@ -117,13 +117,13 @@ SOMEIPにおいてServiceやIFを識別するために各種IDが使用されま
 
 - 【サーバ・クライアント】SOMEIP通信を実施
 
-#### vsomeipによるラズパイ同士のSOMEIP通信
+## vsomeipによるラズパイ同士のSOMEIP通信
 
 COVESAは神
 
 コネクテッドビークルシステムズアライアンス（COVESA）は、以前はGENIVIアライアンスとして知られており、コネクテッドビークルに搭載されているオペレーティングシステムとミドルウェア、および関連するクラウドサービスを統合するためのリファレンスアプローチを開発する非営利の自動車業界アライアンスです。
 
-##### 環境
+### 環境
 
 使用した機材
 
@@ -135,7 +135,7 @@ COVESAは神
 
 - M2 Macbook Air
 
-##### 失敗した例
+### 失敗した例
 
 ラズパイでSOMEIP通信と書いたけど、色々（本質的でないことで）試行錯誤しました。ここではうまく行かなかったことを記載します。
 
@@ -147,7 +147,7 @@ COVESAは神
 
 ラズパイZero-Wではスペック的にvsomeipのビルド環境が作れませんでした。クロスコンパイルも試したのですがうまく行かず断念
 
-##### ラズパイ2台でvsomeip通信させる手順
+### ラズパイ2台でvsomeip通信させる手順
 
 手元にSSHできるラズパイがあるものとします。手順はほぼここに書いてあります。
 
@@ -172,7 +172,7 @@ $ cd vsomeip
 
 通信をお外に出すためにはさらに操作が必要になります。
 
-##### SOMEIP通信（UDP）を使用
+### SOMEIP通信（UDP）を使用
 
 お外との通信では使用するネットワークインターフェースやIPを定義したJSONを置く必要があります。ここではSOMEIP通信にUnreliable=UDP通信を使用することにしています。
 
@@ -460,7 +460,7 @@ int main() {
 
 ```
 
-#### SOMEIP通信のシーケンス（パケット）の説明
+## SOMEIP通信のシーケンス（パケット）の説明
 
 実際にtcpdumpで取得したパケットをWireSharkで見ていきましょう！
 

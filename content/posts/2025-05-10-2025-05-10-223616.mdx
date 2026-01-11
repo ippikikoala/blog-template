@@ -33,9 +33,9 @@ SDV時代の車載アプリケーションはAUTOSARという規格に沿った�
 
 ※アンダーラインは僕の感想です
 
-#### 7 Functional specification
+## 7 Functional specification
 
-##### 7.1 General description
+### 7.1 General description
 
 - Communication Management（以下CM）はAUTOSAR Adaptiveの機能クラスターの一つで、ara（AUTOSAR Runtime for Adaptive Applications）の一部
 
@@ -97,7 +97,7 @@ communication pattern in the application.
 
 - E2E保護や通信品質についてはこのAPIの対象外
 
-##### 7.1.2 Design decisions
+### 7.1.2 Design decisions
 
 - ara::com通信はProxyとSkeltonパターンを使用する
 
@@ -135,7 +135,7 @@ communication pattern in the application.
 
 - サービスインターフェースにはMajorバージョンとMinorバージョンが存在。後方互換性がない場合はMajorバージョンを上げる
 
-##### 7.1.3 Communication paradigms
+### 7.1.3 Communication paradigms
 
 - AUTOSAR AdaptiveではService-Oriented Architecture(SOA)に基づくService-Oriented Communication (SoC)がメインの通信方式
 
@@ -147,7 +147,7 @@ communication pattern in the application.
 
 - Service Discovery の結果、IPC通信をするか外部Etherを使ったSOME/IP通信をするか決まる
 
-##### 7.1.4 Service contract versioning
+### 7.1.4 Service contract versioning
 
 - 設計フェーズではサービスインターフェースにメジャーバージョンとマイナーバージョンを持たせる
 
@@ -167,11 +167,11 @@ communication pattern in the application.
 
 - 原則として、バージョンが分かれる時はインスタンスも別れたはず
 
-###### SWS_CM_99003
+#### SWS_CM_99003
 
 - バージョンの互換性の判断は、Service Discoveryフェーズで行われる
 
-##### 7.2 Raw Data Streaming
+### 7.2 Raw Data Streaming
 
 あまり馴染みがないのでさらっとだけ...
 
@@ -181,7 +181,7 @@ communication pattern in the application.
 
 - RawDataStreamインスタンスを作成すると、ソケットを生成して通信してくれる。各種設定はManifestに書くべし
 
-##### 7.3 Communication Group
+### 7.3 Communication Group
 
 こちらもあまり馴染みないのでさらっと
 

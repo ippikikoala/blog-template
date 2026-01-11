@@ -20,6 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [docs/07-mobile-editing.md](docs/07-mobile-editing.md) - スマホ編集環境
 - [docs/08-cloudflare-r2.md](docs/08-cloudflare-r2.md) - Cloudflare R2セットアップ
 - [docs/09-migration-guide.md](docs/09-migration-guide.md) - はてなブログからの移行ガイド
+- [docs/10-new-post-guide.md](docs/10-new-post-guide.md) - PC新規記事投稿ガイド
 
 ## コマンド
 

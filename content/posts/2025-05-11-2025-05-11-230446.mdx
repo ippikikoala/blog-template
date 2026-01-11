@@ -8,25 +8,25 @@ image: "https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250511191711
 ---
 
 
-###### [PRS_SOMEIPSD_00351]
+#### [PRS_SOMEIPSD_00351]
 
 - FindServeiceのフィールド設定について
 
 - これはパケットを見よう
 
-###### [PRS_SOMEIPSD_00528]・[PRS_SOMEIPSD_00529]
+#### [PRS_SOMEIPSD_00528]・[PRS_SOMEIPSD_00529]
 
 - FindServiceにはIP EndPointOptionを含めないし、含んでいた場合も無視する
 
-###### [PRS_SOMEIPSD_00839]
+#### [PRS_SOMEIPSD_00839]
 
 - サーバ側が Initial Wait Phaseの場合受信したFindServiceは無視する
 
 - Initial Wait Phaseについてはこの後解説があるはず
 
-##### Offer Service Entry
+### Offer Service Entry
 
-###### [PRS_SOMEIPSD_00355]〜[PRS_SOMEIPSD_00827]
+#### [PRS_SOMEIPSD_00355]〜[PRS_SOMEIPSD_00827]
 
 - ara::com仕様書で書かれていたものと同様なので飛ばす
 
@@ -36,31 +36,31 @@ image: "https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250511191711
 
 - OfferServiceのTTLを0xFFFFFFにすると再起動されるまで有効となる。一方0x000000にするとStopOfferServiceとなる
 
-##### 5.1.2.6 Endpoint Handling for Services and Events
+### 5.1.2.6 Endpoint Handling for Services and Events
 
-###### [PRS_SOMEIPSD_00476]
+#### [PRS_SOMEIPSD_00476]
 
 - EndPointが静的にManifestに定義されていたとしても、実際にOfferServiceで送られてきたEndPointが異なった場合は上書きする
 
-###### [PRS_SOMEIPSD_00360]
+#### [PRS_SOMEIPSD_00360]
 
 - OfferServiceに含まれるEndPointからEventは送信される。かつ、クライアントはメソッドのReqを送る
 
-###### [PRS_SOMEIPSD_00361]
+#### [PRS_SOMEIPSD_00361]
 
 - EndPointがUDPの場合、そのままSOME/IP通信に使われる
 
-###### [PRS_SOMEIPSD_00362]
+#### [PRS_SOMEIPSD_00362]
 
 - TCPの場合、クライアントは３ウェイハンドシェイクをする
 
-###### [PRS_SOMEIPSD_00801]
+#### [PRS_SOMEIPSD_00801]
 
 - サービスはUDPとTCPの両方を同時に使用できる
 
 - EventはUDP、MethodはTCPとか
 
-###### [PRS_SOMEIPSD_00802]
+#### [PRS_SOMEIPSD_00802]
 
 - どのメッセージでUDP or TCPを使うかは明示的に設定する必要がある
 
@@ -68,7 +68,7 @@ image: "https://pub-521ec77a6aeb44b18091baa73887e9b7.r2.dev/posts/20250511191711
 
 ....
 
-###### [PRS_SOMEIPSD_00481]
+#### [PRS_SOMEIPSD_00481]
 
 - ServiceInstanceを分ける場合は、Endpointを分けることで識別する必要
 
@@ -112,37 +112,37 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 - すべてのSDメッセージはSD_MULTICAST_IPへ送られる
 
-##### 5.1.3.1 Eventgroup Entry
+### 5.1.3.1 Eventgroup Entry
 
-##### Subscribe Eventgroup Entry
+### Subscribe Eventgroup Entry
 
-##### Stop Subscribe Eventgroup Entry
+### Stop Subscribe Eventgroup Entry
 
-##### Subscribe Eventgroup Acknowledgement (Subscribe Eventgroup Ack) Entry
+### Subscribe Eventgroup Acknowledgement (Subscribe Eventgroup Ack) Entry
 
-##### Subscribe Eventgroup Negative Acknowledgement (Subscribe Eventgroup Nack) Entry
+### Subscribe Eventgroup Negative Acknowledgement (Subscribe Eventgroup Nack) Entry
 
-###### [PRS_SOMEIPSD_00566]
+#### [PRS_SOMEIPSD_00566]
 
 - Subscribe Eventgroup Nackは必要なTCPコネクションが存在しない場合も送られる
 
-###### [PRS_SOMEIPSD_00527]
+#### [PRS_SOMEIPSD_00527]
 
 - TCPコネクションが必要な SubscribeEventgroupについてNACKが帰ってきた場合はクライアントはTCPコネクションを再チェックして、TCPコネクションを貼り直す
 
 - NACKを受け取るとTCPコネクションが切れることになる
 
-##### 5.1.4 Service Discovery Communication Behavior
+### 5.1.4 Service Discovery Communication Behavior
 
-###### [PRS_SOMEIPSD_00800]
+#### [PRS_SOMEIPSD_00800]
 
 - SDのメッセージをなるべく減らすため、メッセージはなるべくまとめて送るべき
 
 - OfferやSubscribeEventgroupAck を同じメッセージに含めて送信できる
 
-##### 5.1.4.1 Startup Behavior
+### 5.1.4.1 Startup Behavior
 
-###### [PRS_SOMEIPSD_00395]
+#### [PRS_SOMEIPSD_00395]
 
 - SDにおいて各インスタンスは少なくとも以下３つの状態を実装する
 
@@ -152,7 +152,7 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 - Main Phase
 
-###### [PRS_SOMEIPSD_00397]
+#### [PRS_SOMEIPSD_00397]
 
 - クライアントサービスのインスタンスは以下の条件を満たした時、Initial Wait Phaseに入る
 
@@ -166,7 +166,7 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 アプリケーションからそのクライアントサービスが要求された
 
-###### [PRS_SOMEIPSD_00133]
+#### [PRS_SOMEIPSD_00133]
 
 - サーバサービスのインスタンスは以下の条件を満たした時、Initial Wait Phaseに入る
 
@@ -176,61 +176,61 @@ Subscribe Eventgroup Ackには最大１つのMulticastIPを含む必要がある
 
 - サーバのサービスが提供可能になった
 
-###### [PRS_SOMEIPSD_00399]
+#### [PRS_SOMEIPSD_00399]
 
 - Initial Wait Phase に入った後、INITIAL_DELAYの時間だけ待機してから、SDメッセージを送信する
 
-###### [PRS_SOMEIPSD_00400]・[PRS_SOMEIPSD_00401]
+#### [PRS_SOMEIPSD_00400]・[PRS_SOMEIPSD_00401]
 
 - INITIAL_DELAYは最大値と最小値の範囲で記載され、その範囲からランダムの値を取る
 
 - ネットワーク負荷を下げるため
 
-###### [PRS_SOMEIPSD_00404]
+#### [PRS_SOMEIPSD_00404]
 
 - 初回のSDメッセージを送信したら、Repetition Phaseに移行する
 
-###### [PRS_SOMEIPSD_00405]
+#### [PRS_SOMEIPSD_00405]
 
 - Repetition Phaseでの待機時間はREPETITIONS_BASE_DELAYに基づく
 
-###### [PRS_SOMEIPSD_00406]
+#### [PRS_SOMEIPSD_00406]
 
 - Repetition Phaseではメッセージ送信のたびに待機時間が倍増
 
-###### [PRS_SOMEIPSD_00407]
+#### [PRS_SOMEIPSD_00407]
 
 - メッセージはREPETITIONS_MAXの回数まで送信可能
 
-###### [PRS_SOMEIPSD_00408]
+#### [PRS_SOMEIPSD_00408]
 
 - クライアントはOfferエントリを受信したらMain Phaseへ遷移し、Findメッセージを送信しない
 
-###### [PRS_SOMEIPSD_00409]
+#### [PRS_SOMEIPSD_00409]
 
 - REPETITIONS_MAX = 0と設定した場合、Repetition Phaseはスキップされ、Main Phaseへ
 
-###### [PRS_SOMEIPSD_00410]
+#### [PRS_SOMEIPSD_00410]
 
 - Repetition Phaseの後、Main Phaseに入る
 
-###### [PRS_SOMEIPSD_00411]
+#### [PRS_SOMEIPSD_00411]
 
 - Main Phaseへ遷移後、CYCLIC_OFFER_DELAYだけ待機して最初のOfferエントリを送信する
 
-###### [PRS_SOMEIPSD_00412]
+#### [PRS_SOMEIPSD_00412]
 
 - CYCLIC_OFFER_DELAYが設定されている場合は、 Main PhaseでOfferを周期的に送信する
 
-###### [PRS_SOMEIPSD_00413]
+#### [PRS_SOMEIPSD_00413]
 
 - Offerメッセージを送信したら次のメッセージ送信までCYCLIC_OFFER_DELAYだけ待つ必要がある
 
-###### [PRS_SOMEIPSD_00415]
+#### [PRS_SOMEIPSD_00415]
 
 - Main PhaseでのFindメッセージの周期的送信は禁止されている
 
-###### [PRS_SOMEIPSD_00582]
+#### [PRS_SOMEIPSD_00582]
 
 -
 
@@ -238,9 +238,9 @@ Subscribe EventGroupメッセージは周期的に送信されるOfferメッセ�
 
 - これは毎回のOfferに対してSubscribeを送れということではないっぽい
 
-##### 5.1.4.2 Server Answer Behavior
+### 5.1.4.2 Server Answer Behavior
 
-###### [PRS_SOMEIPSD_00417]
+#### [PRS_SOMEIPSD_00417]
 
 - 以下の場合でREQUEST_RESPONSE_DELAYにもとづく遅延を入れる必要がある
 
@@ -248,15 +248,15 @@ Subscribe EventGroupメッセージは周期的に送信されるOfferメッセ�
 
 - Offer（Multicats）受信からSubscribe送信まで
 
-###### [PRS_SOMEIPSD_00419]
+#### [PRS_SOMEIPSD_00419]
 
 - ユニキャストのメッセージにユニキャストで応答する場合は遅延の対象外
 
-###### [PRS_SOMEIPSD_00422]
+#### [PRS_SOMEIPSD_00422]
 
 - 基本的な設計としては、FindServiceへの嘔吐は全てユニキャストでOffer Serviceを返答するべき
 
-###### [PRS_SOMEIPSD_00423]
+#### [PRS_SOMEIPSD_00423]
 
 - 最適化のため、以下の振る舞いがサポートされる
 
