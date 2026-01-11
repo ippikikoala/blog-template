@@ -144,6 +144,13 @@ _画像のキャプション_
 <YouTube videoId="動画ID" />
 ```
 
+> **動画IDとは？**
+> YouTubeのURLに含まれる11文字の英数字です。
+> - 通常のURL: `https://www.youtube.com/watch?v=dQw4w9WgXcQ` の `v=` の後ろ
+> - 短縮URL: `https://youtu.be/dQw4w9WgXcQ` の `/` の後ろ
+>
+> この例では `dQw4w9WgXcQ` が動画IDになります。
+
 ### 他の記事へのリンク（内部リンク）
 
 ```markdown

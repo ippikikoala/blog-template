@@ -1,11 +1,11 @@
 interface YouTubeProps {
-  id: string;
+  videoId: string;
   title?: string;
   start?: number;
 }
 
-export default function YouTube({ id, title = "", start }: YouTubeProps) {
-  const src = `https://www.youtube.com/embed/${id}${start ? `?start=${start}` : ""}`;
+export default function YouTube({ videoId, title = "", start }: YouTubeProps) {
+  const src = `https://www.youtube.com/embed/${videoId}${start ? `?start=${start}` : ""}`;
 
   return (
     <div className="relative w-full max-w-4xl mx-auto my-8">
