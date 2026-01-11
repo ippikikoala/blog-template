@@ -123,13 +123,50 @@ a:hover {
 
 .prose h2,
 .prose h3,
-.prose h4 {
+.prose h4,
+.prose h5,
+.prose h6 {
   scroll-margin-top: 80px;
 }
 
+/* 見出しスタイル（本文17pxと区別しやすく） */
 .prose h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 48px;
+  margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--border-color);
+}
+
+.prose h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 40px;
+  margin-bottom: 12px;
+}
+
+.prose h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
+.prose h5 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  color: var(--color-primary);
+}
+
+.prose h6 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: var(--foreground-muted);
 }
 
 /* 画像キャプション（画像直後のイタリック） */
