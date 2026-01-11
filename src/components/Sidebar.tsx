@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getAllPosts, getCategoriesByRegion } from "@/lib/posts";
 import CategoryAccordion from "./CategoryAccordion";
 
@@ -26,12 +27,19 @@ export default function Sidebar() {
     <aside className="space-y-8">
       {/* プロフィール */}
       <div className="card p-6">
-        <h3 className="font-bold text-lg mb-4 text-[var(--color-primary-dark)]">
+        <h3 className="font-bold text-lg mb-1 text-[var(--color-primary-dark)]">
           Profile
         </h3>
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-[var(--background-secondary)] flex items-center justify-center text-4xl">
-            🐨
+          <div className="w-full mx-auto mb-2 overflow-hidden">
+            <Image
+              src="/ippikikoala_profile.png"
+              alt="いっぴきこあら"
+              width={280}
+              height={280}
+              className="object-contain w-full h-auto"
+              priority
+            />
           </div>
           <p className="font-semibold mb-2">いっぴきこあら</p>
           <p className="text-sm text-[var(--foreground-muted)]">

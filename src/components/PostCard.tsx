@@ -25,9 +25,12 @@ export default function PostCard({ post }: PostCardProps) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-5xl">
-              🐨
-            </div>
+            <Image
+              src="/ippikikoala.png"
+              alt="いっぴきこあら"
+              fill
+              className="object-cover"
+            />
           )}
         </div>
 
