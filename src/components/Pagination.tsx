@@ -67,11 +67,10 @@ export default function Pagination({
           <Link
             key={index}
             href={getPageUrl(page)}
-            className={`px-4 py-2 rounded transition-colors ${
-              page === currentPage
-                ? "bg-[var(--color-accent)] text-white"
+            className={`px-4 py-2 rounded transition-colors ${page === currentPage
+                ? "bg-[var(--color-accent)] !text-white"
                 : "border border-[var(--border-color)] hover:bg-[var(--background-secondary)]"
-            }`}
+              }`}
           >
             {page}
           </Link>
