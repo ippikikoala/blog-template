@@ -169,6 +169,52 @@ _画像のキャプション_
 >
 > この例では `dQw4w9WgXcQ` が動画IDになります。
 
+### Instagram埋め込み
+
+```jsx
+<Instagram url="https://www.instagram.com/p/投稿ID/" />
+```
+
+> [!WARNING]
+> **必ず独立した段落として配置してください**
+> 
+> `<Instagram />` コンポーネントは**前後に空行を入れて**配置する必要があります。
+> 文章の途中に配置すると、Hydration Error（ハイドレーションエラー）が発生します。
+> 
+> **❌ NG（エラーになる）**:
+> ```markdown
+> 参考投稿はこちら：<Instagram url="xxx" />
+> ```
+> 
+> **✅ OK（正しい）**:
+> ```markdown
+> 参考投稿はこちら：
+> 
+> <Instagram url="xxx" />
+> ```
+
+> **投稿URLの取得方法**
+> 1. Instagramアプリまたはウェブで投稿を開く
+> 2. **「…」** （その他）ボタンをタップ
+> 3. **「リンクをコピー」** を選択
+> 4. コピーしたURLをそのまま使用
+>
+> **URLの例**:
+> - `https://www.instagram.com/p/ABC123xyz/`
+> - `https://www.instagram.com/reel/ABC123xyz/`
+
+#### オプション
+
+| プロパティ | 型 | デフォルト | 説明 |
+|-----------|-----|-----------|------|
+| `url` | string | **必須** | Instagram投稿のURL |
+| `caption` | boolean | `true` | キャプションを表示するか |
+
+**キャプションを非表示にする例**:
+```jsx
+<Instagram url="https://www.instagram.com/p/投稿ID/" caption={false} />
+```
+
 ### 他の記事へのリンク（内部リンク）
 
 ```markdown
