@@ -23,6 +23,10 @@ export const metadata: Metadata = {
     template: "%s | いっぴきこあらの大冒険",
   },
   description: "鄙びた集落・旅館・廃線・温泉を巡る旅行記ブログ",
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     title: "いっぴきこあらの大冒険",
     description: "鄙びた集落・旅館・廃線・温泉を巡る旅行記ブログ",

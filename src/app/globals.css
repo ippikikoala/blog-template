@@ -64,7 +64,7 @@ a:hover {
   border-radius: 8px;
   box-shadow: var(--card-shadow);
   transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
@@ -170,8 +170,8 @@ a:hover {
 }
 
 /* 画像キャプション（画像直後のイタリック） */
-.prose p:has(> img) + p > em:first-child:last-child,
-.prose p:has(> img) + p:has(> em:first-child) {
+.prose p:has(> img)+p>em:first-child:last-child,
+.prose p:has(> img)+p:has(> em:first-child) {
   display: block;
   text-align: center;
   margin-top: -1rem;
@@ -181,7 +181,7 @@ a:hover {
   color: var(--foreground-muted);
 }
 
-.prose p:has(> img) + p > em:first-child {
+.prose p:has(> img)+p>em:first-child {
   font-style: normal;
 }
 
@@ -292,13 +292,25 @@ a:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* ページトップボタン */
@@ -361,6 +373,11 @@ a:hover {
 }
 
 @keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }

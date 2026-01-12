@@ -98,15 +98,16 @@ export function getAllRegions(): Region[] {
 }
 
 /**
- * カテゴリ（都道府県）の表示順序を取得
- * @param prefectureName 都道府県名
- * @returns { regionOrder: number, prefectureOrder: number } または null
+ * カテゴリ（都道府県またはテーマ）の表示順序を取得
+ * @param categoryName カテゴリ名（都道府県名またはテーマ名）
+ * @returns { regionOrder: number, prefectureOrder: number } または { regionOrder: number, themeOrder: number } または null
  */
 export function getCategoryOrder(
-  prefectureName: string
-): { regionOrder: number; prefectureOrder: number } | null {
+  categoryName: string
+): { regionOrder: number; prefectureOrder?: number; themeOrder?: number } | null {
+  // 都道府県カテゴリの場合
   for (const region of categoryConfig.regions) {
-    const prefecture = region.prefectures.find((p) => p.name === prefectureName);
+    const prefecture = region.prefectures.find((p) => p.name === categoryName);
     if (prefecture) {
       return {
         regionOrder: region.order,
@@ -114,6 +115,16 @@ export function getCategoryOrder(
       };
     }
   }
+
+  // テーマ別カテゴリの場合（地方の後に表示するため、regionOrderを大きな値に設定）
+  const theme = categoryConfig.themeCategories.find((t) => t.name === categoryName);
+  if (theme) {
+    return {
+      regionOrder: 999, // 都道府県の後に表示
+      themeOrder: theme.order,
+    };
+  }
+
   return null;
 }
 
@@ -133,4 +144,35 @@ export function getUniqueRegionsFromCategories(categories: string[]): string[] {
   }
 
   return Array.from(regions);
+}
+
+/**
+ * カテゴリ名がテーマ別カテゴリかどうかを判定
+ * @param categoryName カテゴリ名
+ * @returns テーマ別カテゴリの場合true
+ */
+export function isThemeCategory(categoryName: string): boolean {
+  return categoryConfig.themeCategories.some(
+    (theme) => theme.name === categoryName
+  );
+}
+
+/**
+ * すべてのテーマ別カテゴリを取得（設定順）
+ * @returns テーマ別カテゴリの配列
+ */
+export function getAllThemeCategories(): { name: string; order: number }[] {
+  return categoryConfig.themeCategories
+    .map((theme) => ({ name: theme.name, order: theme.order }))
+    .sort((a, b) => a.order - b.order);
+}
+
+/**
+ * テーマ別カテゴリの表示順序を取得
+ * @param themeName テーマ別カテゴリ名
+ * @returns 表示順序、見つからない場合はnull
+ */
+export function getThemeCategoryOrder(themeName: string): number | null {
+  const theme = categoryConfig.themeCategories.find((t) => t.name === themeName);
+  return theme ? theme.order : null;
 }

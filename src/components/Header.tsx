@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getAllCategories, getAllTags } from "@/lib/posts";
+import { getAllCategories, getAllTags, getThemeCategories } from "@/lib/posts";
 import MobileMenu from "./MobileMenu";
 
 const navigation = [
@@ -12,6 +12,7 @@ const navigation = [
 export default function Header() {
   const categories = getAllCategories();
   const tags = getAllTags();
+  const themeCategories = getThemeCategories();
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-color)] bg-[var(--header-bg)] backdrop-blur-sm">
@@ -54,7 +55,11 @@ export default function Header() {
           </div>
 
           {/* Mobile Menu */}
-          <MobileMenu categories={categories} tags={tags} />
+          <MobileMenu
+            categories={categories}
+            tags={tags}
+            themeCategories={themeCategories}
+          />
         </div>
       </nav>
     </header>

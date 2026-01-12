@@ -12,6 +12,7 @@ interface CategoryData {
 interface MobileMenuProps {
   categories: CategoryData[];
   tags: CategoryData[];
+  themeCategories: CategoryData[];
 }
 
 const navigation = [
@@ -19,7 +20,7 @@ const navigation = [
   { name: "About", href: "/about" },
 ];
 
-export default function MobileMenu({ categories, tags }: MobileMenuProps) {
+export default function MobileMenu({ categories, tags, themeCategories }: MobileMenuProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -123,6 +124,27 @@ export default function MobileMenu({ categories, tags }: MobileMenuProps) {
                 </li>
               ))}
             </ul>
+
+            {/* テーマ別カテゴリ（都道府県と並列） */}
+            {themeCategories.length > 0 && (
+              <ul className="space-y-1 mt-2">
+                {themeCategories.map((cat) => (
+                  <li key={cat.name}>
+                    <Link
+                      href={`/categories/${encodeURIComponent(cat.name)}`}
+                      className="flex justify-between text-sm text-[var(--foreground)] hover:text-[var(--color-accent)] py-1"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <span>{cat.name}</span>
+                      <span className="text-[var(--foreground-subtle)]">
+                        ({cat.count})
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+
             {categories.length > 10 && (
               <Link
                 href="/categories"

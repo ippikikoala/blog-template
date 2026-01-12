@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getAllPosts, getCategoriesByRegion } from "@/lib/posts";
+import { getAllPosts, getCategoriesByRegion, getThemeCategories } from "@/lib/posts";
 import CategoryAccordion from "./CategoryAccordion";
 
 export default function Sidebar() {
@@ -8,6 +8,9 @@ export default function Sidebar() {
 
   // 地方別のカテゴリ（都道府県）を取得
   const regionCategories = getCategoriesByRegion();
+
+  // テーマ別カテゴリを取得
+  const themeCategories = getThemeCategories();
 
   // タグを集計
   const tags = posts.reduce(
@@ -73,7 +76,10 @@ export default function Sidebar() {
           <h3 className="font-bold text-lg mb-4 text-[var(--color-primary-dark)]">
             Categories
           </h3>
-          <CategoryAccordion regionCategories={regionCategories} />
+          <CategoryAccordion
+            regionCategories={regionCategories}
+            themeCategories={themeCategories}
+          />
         </div>
       )}
 

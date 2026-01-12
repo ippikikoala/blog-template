@@ -6,10 +6,12 @@ import { getCategoriesByRegion } from "@/lib/posts";
 
 interface CategoryAccordionProps {
   regionCategories: ReturnType<typeof getCategoriesByRegion>;
+  themeCategories: { name: string; count: number }[];
 }
 
 export default function CategoryAccordion({
   regionCategories,
+  themeCategories,
 }: CategoryAccordionProps) {
   const [openRegions, setOpenRegions] = useState<Set<string>>(new Set());
 
@@ -27,6 +29,7 @@ export default function CategoryAccordion({
 
   return (
     <div className="space-y-3">
+      {/* 地方別カテゴリ（アコーディオン） */}
       {regionCategories.map(({ region, categories }) => {
         const isOpen = openRegions.has(region.id);
         const totalCount = categories.reduce((sum, cat) => sum + cat.count, 0);
@@ -74,6 +77,23 @@ export default function CategoryAccordion({
           </div>
         );
       })}
+
+      {/* テーマ別カテゴリ（アコーディオンと同じレベルで表示） */}
+      {themeCategories.map(({ name, count }) => (
+        <div key={name}>
+          <Link
+            href={`/categories/${encodeURIComponent(name)}`}
+            className="flex items-center gap-2 w-full text-left group"
+          >
+            <span className="text-sm font-semibold text-[var(--color-primary-dark)] group-hover:text-[var(--color-accent)] transition-colors pl-5">
+              {name}
+            </span>
+            <span className="text-xs text-[var(--foreground-subtle)]">
+              ({count})
+            </span>
+          </Link>
+        </div>
+      ))}
     </div>
   );
 }

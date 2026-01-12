@@ -3,6 +3,8 @@
  *
  * このファイルで地方区分と都道府県の表示順序を一元管理します。
  * 記事のfrontmatterには都道府県名のみを指定すれば、自動的に地方が判定されます。
+ * 
+ * テーマ別カテゴリ（IT、小山田壮平など）も管理します。
  */
 
 export interface Prefecture {
@@ -18,8 +20,18 @@ export interface Region {
   prefectures: Prefecture[];
 }
 
+/**
+ * テーマ別カテゴリ（都道府県以外のカテゴリ）
+ */
+export interface ThemeCategory {
+  id: string;      // 識別子（英数字、例: 'it'）
+  name: string;    // 表示名（例: 'IT'）
+  order: number;   // テーマカテゴリ内での表示順序
+}
+
 export interface CategoryConfig {
   regions: Region[];
+  themeCategories: ThemeCategory[];
 }
 
 /**
@@ -132,4 +144,9 @@ export const categoryConfig: CategoryConfig = {
       ],
     },
   ],
+  themeCategories: [
+    { id: 'it', name: 'IT', order: 1 },
+    { id: 'oyamada', name: '小山田壮平', order: 2 },
+  ],
 };
+

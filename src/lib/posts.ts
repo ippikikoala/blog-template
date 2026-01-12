@@ -5,6 +5,7 @@ import {
   normalizeCategory,
   getCategoryOrder,
   getAllRegions,
+  getAllThemeCategories,
 } from "@/lib/categoryUtils";
 import type { Region } from "@/config/categories";
 
@@ -115,9 +116,9 @@ export function getPostsByTag(tag: string): PostMeta[] {
 }
 
 /**
- * すべてのカテゴリ（都道府県）を記事数とともに取得
+ * すべてのカテゴリ（都道府県+テーマ別）を記事数とともに取得
  * 複数カテゴリ記事は各カテゴリで重複カウントされる
- * @returns カテゴリ名と記事数の配列（設定ファイルの順序でソート）
+ * @returns カテゴリ名と記事数の配列（都道府県→テーマ別の順でソート）
  */
 export function getAllCategories(): { name: string; count: number }[] {
   const posts = getAllPosts();
@@ -138,15 +139,24 @@ export function getAllCategories(): { name: string; count: number }[] {
       const orderA = getCategoryOrder(a.name);
       const orderB = getCategoryOrder(b.name);
 
-      // 設定にない都道府県は最後に配置
+      // 設定にないカテゴリは最後に配置
       if (!orderA) return 1;
       if (!orderB) return -1;
 
-      // 地方順 → 都道府県順でソート
+      // regionOrderでソート（都道府県が先、テーマ別が後）
       if (orderA.regionOrder !== orderB.regionOrder) {
         return orderA.regionOrder - orderB.regionOrder;
       }
-      return orderA.prefectureOrder - orderB.prefectureOrder;
+
+      // 同じregionOrder内では、prefectureOrderまたはthemeOrderでソート
+      if (orderA.prefectureOrder !== undefined && orderB.prefectureOrder !== undefined) {
+        return orderA.prefectureOrder - orderB.prefectureOrder;
+      }
+      if (orderA.themeOrder !== undefined && orderB.themeOrder !== undefined) {
+        return orderA.themeOrder - orderB.themeOrder;
+      }
+
+      return 0;
     });
 }
 
@@ -204,12 +214,38 @@ export function getCategoriesByRegion(): RegionWithCategories[] {
           const orderA = getCategoryOrder(a.name);
           const orderB = getCategoryOrder(b.name);
           if (!orderA || !orderB) return 0;
-          return orderA.prefectureOrder - orderB.prefectureOrder;
+          return (orderA.prefectureOrder ?? 0) - (orderB.prefectureOrder ?? 0);
         });
 
       return { region, categories };
     })
     .filter((item) => item.categories.length > 0); // 記事が存在する地方のみ
+}
+
+/**
+ * テーマ別カテゴリを記事数とともに取得
+ * @returns テーマ別カテゴリと記事数の配列（設定順）
+ */
+export function getThemeCategories(): { name: string; count: number }[] {
+  const posts = getAllPosts();
+  const categoryCounts: Record<string, number> = {};
+
+  // 記事数をカウント
+  posts.forEach((post) => {
+    const categories = normalizeCategory(post.category);
+    categories.forEach((category) => {
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+  });
+
+  // テーマ別カテゴリのみをフィルタして返す
+  const themeCategories = getAllThemeCategories();
+  return themeCategories
+    .map((theme) => ({
+      name: theme.name,
+      count: categoryCounts[theme.name] || 0,
+    }))
+    .filter((cat) => cat.count > 0); // 記事が存在するテーマのみ
 }
 
 export function getRelatedPosts(
