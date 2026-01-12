@@ -146,7 +146,7 @@ export const categoryConfig: CategoryConfig = {
   ],
   themeCategories: [
     { id: 'it', name: 'IT', order: 1 },
-    { id: 'oyamada', name: '小山田壮平', order: 2 },
+    { id: 'music', name: '音楽', order: 2 },
   ],
 };
 
