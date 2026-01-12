@@ -297,3 +297,84 @@ export function getAdjacentPosts(slug: string): {
     next: currentIndex > 0 ? posts[currentIndex - 1] : null,
   };
 }
+
+/**
+ * 月別アーカイブ情報
+ */
+export interface MonthlyArchive {
+  year: number;
+  month: number;
+  count: number;
+  label: string; // "2026年1月" 形式
+}
+
+/**
+ * 月別アーカイブを取得
+ * @returns 年月ごとの記事数（新しい順）
+ */
+export function getMonthlyArchive(): MonthlyArchive[] {
+  const posts = getAllPosts();
+  const archive: Record<string, { year: number; month: number; count: number }> = {};
+
+  posts.forEach((post) => {
+    if (!post.date) return;
+    const date = new Date(post.date);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const key = `${year}-${month}`;
+
+    if (!archive[key]) {
+      archive[key] = { year, month, count: 0 };
+    }
+    archive[key].count++;
+  });
+
+  return Object.values(archive)
+    .sort((a, b) => {
+      if (a.year !== b.year) return b.year - a.year;
+      return b.month - a.month;
+    })
+    .map((item) => ({
+      ...item,
+      label: `${item.year}年${item.month}月`,
+    }));
+}
+
+/**
+ * 特定の年月の記事を取得
+ * @param year 年
+ * @param month 月
+ * @returns 該当月の記事一覧
+ */
+export function getPostsByMonth(year: number, month: number): PostMeta[] {
+  return getAllPosts().filter((post) => {
+    if (!post.date) return false;
+    const date = new Date(post.date);
+    return date.getFullYear() === year && date.getMonth() + 1 === month;
+  });
+}
+
+/**
+ * 記事を検索
+ * タイトル、説明文、タグを検索対象とする
+ * @param query 検索キーワード
+ * @returns マッチした記事一覧
+ */
+export function searchPosts(query: string): PostMeta[] {
+  if (!query || query.trim() === '') return [];
+
+  const normalizedQuery = query.toLowerCase().trim();
+
+  return getAllPosts().filter((post) => {
+    const searchableText = [
+      post.title,
+      post.description,
+      ...(post.tags || []),
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    return searchableText.includes(normalizedQuery);
+  });
+}
+

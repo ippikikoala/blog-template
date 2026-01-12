@@ -35,7 +35,7 @@ export default async function TagPage({ params }: Props) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex flex-col lg:flex-row gap-8">
         <main className="flex-1">
           <div className="mb-8">

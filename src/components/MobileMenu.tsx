@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 
@@ -23,9 +24,28 @@ const navigation = [
 export default function MobileMenu({ categories, tags, themeCategories }: MobileMenuProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Close menu when pathname changes (page navigation)
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
+
+  // Close menu when resizing to desktop size
+  useEffect(() => {
+    const handleResize = () => {
+      // デスクトップサイズ（768px以上）になったらメニューを閉じる
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Prevent body scroll when menu is open

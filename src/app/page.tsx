@@ -11,7 +11,7 @@ export default function Home() {
   const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="flex flex-col lg:flex-row gap-12">
         {/* メインコンテンツ */}
         <main className="flex-1">

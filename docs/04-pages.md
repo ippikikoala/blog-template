@@ -246,6 +246,75 @@ src/app/
 </html>
 ```
 
+---
+
+## レイアウト幅のカスタマイズ
+
+ページのコンテナ幅を変更することで、カード画像のサイズを調整できます。
+
+### コンテナ幅の設定
+
+各ページのコンテナは Tailwind CSS のクラスで制御されています：
+
+| クラス | 最大幅 | 用途 |
+|--------|--------|------|
+| `max-w-6xl` | 1152px | 標準（以前のデフォルト） |
+| `max-w-7xl` | 1280px | 現在のデフォルト |
+| `max-w-screen-xl` | 1280px | 同等 |
+| `max-w-screen-2xl` | 1536px | より広いレイアウト |
+
+### 変更方法
+
+1. 対象のページファイルを開く
+2. `className="max-w-7xl mx-auto ..."` のクラスを変更
+
+**例**: すべてのページを広くする場合
+
+```tsx
+// 変更前
+<div className="max-w-7xl mx-auto px-4 py-12">
+
+// 変更後（より広く）
+<div className="max-w-screen-2xl mx-auto px-4 py-12">
+```
+
+### 対象ファイル一覧
+
+レイアウト幅を統一したい場合、以下のすべてのファイルを変更します：
+
+| ファイル | 説明 |
+|----------|------|
+| `src/app/page.tsx` | トップページ |
+| `src/app/page/[page]/page.tsx` | ページネーション |
+| `src/app/posts/[slug]/page.tsx` | 記事詳細 |
+| `src/app/categories/page.tsx` | カテゴリ一覧 |
+| `src/app/categories/[category]/page.tsx` | カテゴリ別記事 |
+| `src/app/tags/page.tsx` | タグ一覧 |
+| `src/app/tags/[tag]/page.tsx` | タグ別記事 |
+| `src/app/search/page.tsx` | 検索結果 |
+| `src/app/archive/[year]/[month]/page.tsx` | 月別アーカイブ |
+| `src/app/about/page.tsx` | Aboutページ |
+
+### サイドバー幅の調整
+
+サイドバーの幅を変更することでもカード領域を広げられます：
+
+```tsx
+// 変更前（320px）
+<div className="lg:w-80 shrink-0">
+
+// 変更後（256px）
+<div className="lg:w-64 shrink-0">
+```
+
+| クラス | 幅 |
+|--------|-----|
+| `w-64` | 256px |
+| `w-72` | 288px |
+| `w-80` | 320px |
+
+---
+
 ## SEO対応
 
 ### グローバルメタデータ
