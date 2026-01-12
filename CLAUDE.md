@@ -20,7 +20,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - [docs/07-mobile-editing.md](docs/07-mobile-editing.md) - スマホ編集環境
 - [docs/08-cloudflare-r2.md](docs/08-cloudflare-r2.md) - Cloudflare R2セットアップ
 - [docs/09-migration-guide.md](docs/09-migration-guide.md) - はてなブログからの移行ガイド
-- [docs/10-new-post-guide.md](docs/10-new-post-guide.md) - PC新規記事投稿ガイド
+- [docs/10-category-hierarchy.md](docs/10-category-hierarchy.md) - カテゴリ階層構造仕様
+- [docs/11-category-management.md](docs/11-category-management.md) - カテゴリ管理ガイド
+- [docs/12-new-post-guide.md](docs/12-new-post-guide.md) - PC新規記事投稿ガイド
+- [docs/13-about-page-editing.md](docs/13-about-page-editing.md) - Aboutページ編集ガイド
+- [docs/14-sidebar-customization.md](docs/14-sidebar-customization.md) - サイドバーカスタマイズガイド
+- [docs/15-seo-guide.md](docs/15-seo-guide.md) - SEO設定ガイド
+- [docs/16-edit-post-guide.md](docs/16-edit-post-guide.md) - 既存記事修正ガイド（スマホ・PC両対応）
 
 ## コマンド
 
