@@ -662,9 +662,9 @@
 
 ## 進捗管理
 
-- **完了**: 21/27（#1-9, #11-15, #17-19, #21-27）
-- **進行中**: 0/27
-- **未着手**: 6/27（#10一部, #16, #20一部）
+- **完了**: 21/28（#1-9, #11-15, #17-19, #21-27）
+- **進行中**: 1/28（#28）
+- **未着手**: 6/28（#10一部, #16, #20一部）
 
 
 ---
@@ -748,5 +748,39 @@
 - `src/app/favicon.ico` - 削除
 - `src/app/icon.png` - 保持（Next.js標準）
 **ステータス**: ✅ 完了
+
+---
+
+## 28. SEO対策（サイトマップ・Google Search Console）
+
+### 背景
+- はてなブログから移行後、新ブログがGoogle検索結果に表示されにくい
+- サイトマップがないとGoogleがサイト構造を把握しにくい
+- Google Search Consoleで新サイトを登録する必要がある
+
+### 対応
+
+#### Step 1: サイトマップ・robots.txt作成
+- [x] `src/app/sitemap.ts` を作成（全記事・カテゴリ・固定ページのURLを自動生成）
+- [x] `src/app/robots.ts` を作成（検索エンジン向けクロール指示とサイトマップ場所を通知）
+- [x] ローカルでビルド・動作確認
+- [ ] 本番環境にデプロイ
+
+#### Step 2: Google Search Console登録
+- [ ] [Google Search Console](https://search.google.com/search-console/) にアクセス
+- [ ] URLプレフィックス `https://www.ippikikoala.com` を登録
+- [ ] 所有権を確認（DNS / HTMLファイル / HTMLタグのいずれか）
+- [ ] サイトマップ `https://www.ippikikoala.com/sitemap.xml` を送信
+
+#### Step 3: はてなブログ側のリダイレクト設定（任意）
+- [ ] はてなブログの「詳細設定」→「headに要素を追加」でJavaScriptリダイレクトを設定
+- [ ] 旧URL → 新URLへの転送を確認
+
+**優先度**: 高
+**ファイル**:
+- `src/app/sitemap.ts` - サイトマップ自動生成
+- `src/app/robots.ts` - robots.txt自動生成
+- `docs/15-seo-guide.md` - SEO設定ガイド
+**ステータス**: 進行中（サイトマップ作成完了、デプロイ・Search Console登録待ち）
 
 ---
