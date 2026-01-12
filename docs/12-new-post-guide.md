@@ -144,6 +144,24 @@ _画像のキャプション_
 <YouTube videoId="動画ID" />
 ```
 
+> [!WARNING]
+> **必ず独立した段落として配置してください**
+> 
+> `<YouTube />` コンポーネントは**前後に空行を入れて**配置する必要があります。
+> 文章の途中に配置すると、Hydration Error（ハイドレーションエラー）が発生します。
+> 
+> **❌ NG（エラーになる）**:
+> ```markdown
+> 参考動画はこちら：<YouTube videoId="xxx" />
+> ```
+> 
+> **✅ OK（正しい）**:
+> ```markdown
+> 参考動画はこちら：
+> 
+> <YouTube videoId="xxx" />
+> ```
+
 > **動画IDとは？**
 > YouTubeのURLに含まれる11文字の英数字です。
 > - 通常のURL: `https://www.youtube.com/watch?v=dQw4w9WgXcQ` の `v=` の後ろ
