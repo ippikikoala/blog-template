@@ -32,7 +32,8 @@ function ProfileSection() {
         </div>
         <p className="font-semibold mb-2">いっぴきこあら</p>
         <p className="text-sm text-[var(--foreground-muted)]">
-          鄙びた集落・旅館を巡るブログ。温泉、廃線、炭鉱、離島などを訪ねています。
+          鄙びた集落・旅館を巡るブログ。カメラを持って温泉、廃線、炭鉱、離島などを訪ねています。
+          α6400 / SEL1670Z
         </p>
       </div>
       <div className="mt-4 flex justify-center gap-4">
