@@ -172,13 +172,13 @@ export const metadata: Metadata = {
 
 ## 5. SEOチェックリスト
 
-### 初期設定
+### 初期設定（2026-01-12 完了）
 
 - [x] サイトマップ（`sitemap.xml`）を作成
 - [x] robots.txt を作成
-- [ ] Google Search Console にサイトを登録
-- [ ] サイトマップを送信
-- [ ] はてなブログにリダイレクト設定（任意）
+- [x] Google Search Console にサイトを登録（HTMLファイル方式で所有権確認）
+- [x] サイトマップを送信
+- [x] はてなブログにリダイレクト設定
 
 ### 継続的な運用
 
@@ -197,6 +197,7 @@ export const metadata: Metadata = {
 | `src/app/layout.tsx` | メタデータ（OGP、タイトル等）設定 |
 | `src/config/categories.ts` | カテゴリ定義（サイトマップに使用） |
 | `src/lib/posts.ts` | 記事一覧取得（サイトマップに使用） |
+| `public/google35e293fc2e7112bb.html` | Google Search Console 所有権確認ファイル |
 
 ---
 
