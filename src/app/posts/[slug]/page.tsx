@@ -172,7 +172,7 @@ export default async function PostPage({ params }: Props) {
             <div className="mt-12 pt-8 border-t border-[var(--border-color)]">
               <ShareButtons
                 title={post.title}
-                url={`https://example.com/posts/${slug}`}
+                url={`https://ippikikoala.com/posts/${slug}`}
               />
             </div>
           </article>

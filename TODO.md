@@ -671,9 +671,9 @@
 
 ## 進捗管理
 
-- **完了**: 23/28（#1-9, #11-19, #21-28）
-- **進行中**: 0/28
-- **未着手**: 5/28（#10一部, #20一部）
+- **完了**: 23/29（#1-9, #11-19, #21-28）
+- **進行中**: 1/29（#29）
+- **未着手**: 5/29（#10一部, #20一部）
 
 
 ---
@@ -688,7 +688,78 @@
 
 ---
 
-最終更新: 2026-01-12
+## 29. ドキュメントと実装の整合性確認・修正
+
+### 背景
+- docsフォルダ内のドキュメントが古い情報のまま残っている
+- 実装が先行しており、ドキュメントの更新が追いついていない状況
+
+### 乖離点の詳細
+
+#### 🔴 優先度：高（すぐ修正すべき）
+
+1. **docs/06-config.md** - 古い情報のまま
+   - ドメイン: 「未定」→ 実際は `ippikikoala.com` に確定済み
+   - R2バケット: 「後で設定」→ 実際は設定完了
+   - ファビコン: 「後で追加」→ 実際は実装済み
+   - TODO項目がほぼ完了しているのにチェックマークなし
+
+2. **docs/10-category-hierarchy.md** - カテゴリ名の不一致
+   - 「小山田壮平」カテゴリ → 実装では「音楽」に変更済み
+
+3. **src/app/posts/[slug]/page.tsx:175** - 仮のURL
+   - `https://example.com` → `https://ippikikoala.com` に修正すべき
+
+#### 🟡 優先度：中（追記が必要）
+
+4. **docs/02-components.md** - 新規コンポーネントの記載漏れ
+   - SearchBox（検索ボックス）
+   - MonthlyArchive（月別アーカイブ）
+   - CategoryAccordion（カテゴリアコーディオン）
+   - MobileMenu（モバイルメニュー）
+   - 埋め込みコンポーネント（YouTube, GoogleMap, Instagram）
+   - Sidebar構成の変更（recentPostsは無効化、searchとarchiveが追加）
+
+5. **docs/03-content.md** - カテゴリ仕様の更新
+   - テーマ別カテゴリの追加
+   - 複数カテゴリ対応（配列形式）
+   - 画像パス: `/public/images/` → Cloudflare R2のURL
+
+6. **docs/04-pages.md** - 新規ページの記載漏れ
+   - `/search` - 検索ページ
+   - `/archive/[year]/[month]` - 月別アーカイブページ
+
+7. **docs/00-overview.md** - 新機能の記載
+   - Phase 7として検索・アーカイブ機能の追加を記載
+
+#### 🟢 優先度：低（細かい改善）
+
+8. **Headerの幅統一**
+   - src/components/Header.tsx:19 が `max-w-6xl`
+   - 他のページは `max-w-7xl` → 統一を推奨
+
+### ✅ 整合性が取れている部分
+- デザイン仕様（色、フォント、レイアウト）
+- 技術スタック（Next.js 16, React 19, Tailwind CSS 4）
+- インフラ設定（Vercel, Cloudflare R2）
+- 基本的なページ構造
+
+### 対応
+- [x] docs/06-config.md を更新（完了済み項目を反映）
+- [x] docs/10-category-hierarchy.md を更新（テーマ別カテゴリを「音楽」に修正）
+- [x] src/app/posts/[slug]/page.tsx のShareButtons URLを修正
+- [x] docs/02-components.md に新規コンポーネントを追記
+- [ ] docs/03-content.md にテーマ別カテゴリ・複数カテゴリ対応を追記
+- [ ] docs/04-pages.md に検索・アーカイブページを追記
+- [ ] docs/00-overview.md にPhase 7を追記
+- [ ] src/components/Header.tsx の幅を統一（max-w-7xl）
+
+**優先度**: 中
+**ステータス**: 進行中（4/8完了）
+
+---
+
+最終更新: 2026-01-13
 
 ---
 

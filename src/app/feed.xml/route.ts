@@ -5,8 +5,8 @@ export async function GET() {
   const siteUrl = process.env.SITE_URL || "http://localhost:3000";
 
   const feed = new RSS({
-    title: "My Blog",
-    description: "Personal blog",
+    title: "いっぴきこあらの大冒険",
+    description: "鄙びた集落・旅館・廃線・温泉を巡る旅行記ブログ",
     site_url: siteUrl,
     feed_url: `${siteUrl}/feed.xml`,
     language: "ja",

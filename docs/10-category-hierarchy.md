@@ -22,7 +22,7 @@
 | カテゴリ | 説明 | 記事数 |
 |---------|------|--------|
 | IT | IT・技術関連記事 | 10件 |
-| 小山田壮平 | 小山田壮平関連記事 | 1件 |
+| 音楽 | 音楽関連記事 | 1件 |
 
 ## UI表示
 
@@ -42,7 +42,7 @@ Categories
 ... (地方アコーディオン)
 
 IT (10)                [単独リンク]
-小山田壮平 (1)          [単独リンク]
+音楽 (1)               [単独リンク]
 ```
 
 - **地方アコーディオン**: クリックで展開/折りたたみ
@@ -143,7 +143,7 @@ getCategoryOrder(categoryName: string): { regionOrder: number; ... } | null
 ```typescript
 themeCategories: [
   { id: 'it', name: 'IT', order: 1 },
-  { id: 'oyamada', name: '小山田壮平', order: 2 },
+  { id: 'music', name: '音楽', order: 2 },
   { id: 'onsen', name: '温泉', order: 3 },  // ← 新規追加
 ],
 ```
@@ -202,7 +202,7 @@ category: "青森県"  # 変更不要
 
 ```yaml
 category: "IT"
-category: "小山田壮平"
+category: "音楽"
 ```
 
 ## 参考

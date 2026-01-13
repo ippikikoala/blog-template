@@ -4,15 +4,23 @@
 
 ```
 src/components/
-├── Header.tsx          # ヘッダー（ナビゲーション）
-├── Footer.tsx          # フッター
-├── Sidebar.tsx         # サイドバー
-├── PostCard.tsx        # 記事カード
-├── Pagination.tsx      # ページネーション
-├── TableOfContents.tsx # 目次
-├── Lightbox.tsx        # 画像拡大表示
-├── ShareButtons.tsx    # SNSシェアボタン
-└── ScrollToTop.tsx     # ページトップボタン
+├── Header.tsx              # ヘッダー（ナビゲーション）
+├── Footer.tsx              # フッター
+├── Sidebar.tsx             # サイドバー
+├── PostCard.tsx            # 記事カード
+├── Pagination.tsx          # ページネーション
+├── TableOfContents.tsx     # 目次
+├── Lightbox.tsx            # 画像拡大表示
+├── ShareButtons.tsx        # SNSシェアボタン
+├── ScrollToTop.tsx         # ページトップボタン
+├── SearchBox.tsx           # 検索ボックス
+├── MonthlyArchive.tsx      # 月別アーカイブ（年別アコーディオン）
+├── CategoryAccordion.tsx   # カテゴリアコーディオン（地方別＋テーマ別）
+├── MobileMenu.tsx          # モバイルメニュー（ハンバーガーメニュー）
+└── embeds/
+    ├── YouTube.tsx         # YouTube埋め込み
+    ├── GoogleMap.tsx       # Googleマップ埋め込み
+    └── Instagram.tsx       # Instagram埋め込み
 ```
 
 ## 各コンポーネント仕様
@@ -63,19 +71,24 @@ src/components/
 
 **Props**: なし
 
-**構成**:
+**構成** (`/config/sidebar.ts`で有効/無効・順序を設定可能):
 - プロフィールカード
-  - アイコン（絵文字）
+  - アイコン画像（/ippikikoala_profile.png）
   - 名前
   - 自己紹介
   - SNSリンク
-- カテゴリ一覧（上位10件）
+- 検索ボックス（SearchBox）
+- 月別アーカイブ（MonthlyArchive）
+- カテゴリ一覧（CategoryAccordion: 地方別アコーディオン＋テーマ別カテゴリ）
 - タグ一覧（上位15件）
-- 最新記事（5件）
+- 最新記事（5件、デフォルト無効化）
 
 **スタイル**:
 - 幅: 320px (lg:w-80)
 - 各セクションはカードコンポーネント
+
+**設定ファイル**:
+- `src/config/sidebar.ts` - 表示セクションの有効/無効、順序を設定
 
 ---
 
@@ -214,6 +227,195 @@ interface ShareButtonsProps {
 - 背景: var(--color-accent)
 - 円形: 48px (モバイル: 40px)
 
+---
+
+### SearchBox
+
+**役割**: サイドバー内検索ボックス
+
+**Props**: なし
+
+**構成**:
+- テキスト入力フィールド
+- 検索アイコンボタン
+
+**ロジック**:
+- フォーム送信で `/search?q={query}` へ遷移
+- クライアントコンポーネント（useRouter使用）
+
+**スタイル**:
+- 角丸入力フィールド（focus時にアクセントカラーのring）
+- 右側に検索アイコン配置
+
+---
+
+### MonthlyArchive
+
+**役割**: 年別アコーディオン形式の月別アーカイブ
+
+**Props**:
+```typescript
+interface Props {
+  archives: MonthlyArchive[]; // { year, month, count }[]
+}
+```
+
+**構成**:
+- 年ごとにグループ化されたアコーディオン
+- 各年をクリックで展開/折りたたみ
+- 月ごとのリンクと記事数表示
+
+**ロジック**:
+- 最新の年をデフォルトで開く
+- 年の合計記事数を表示
+- クライアントコンポーネント（開閉状態管理）
+
+**スタイル**:
+- 年ヘッダー: ホバー時に背景色変更
+- 月リスト: 左インデント + ボーダー
+- 右側に記事数を小さく表示
+
+---
+
+### CategoryAccordion
+
+**役割**: 地方別カテゴリ（アコーディオン）＋テーマ別カテゴリ
+
+**Props**:
+```typescript
+interface Props {
+  regionCategories: { region: Region; categories: CategoryCount[] }[];
+  themeCategories: { name: string; count: number }[];
+}
+```
+
+**構成**:
+- 地方別カテゴリ（北海道、東北、関東など）
+  - 地方名クリックで展開/折りたたみ
+  - 都道府県リストと記事数
+- テーマ別カテゴリ（旅の話、雑記など）
+  - アコーディオンと同じレベルで表示
+  - 直接カテゴリページへリンク
+
+**ロジック**:
+- 地方ごとの開閉状態を管理
+- クライアントコンポーネント
+
+**スタイル**:
+- 地方名: 太字、ホバー時アクセントカラー
+- 都道府県: 左インデント、ボーダーライン
+- テーマカテゴリ: 左padding
+
+---
+
+### MobileMenu
+
+**役割**: モバイル用ハンバーガーメニュー（全画面オーバーレイ）
+
+**Props**:
+```typescript
+interface Props {
+  categories: CategoryData[];
+  tags: CategoryData[];
+  themeCategories: CategoryData[];
+}
+```
+
+**構成**:
+- ハンバーガーアイコンボタン（md未満で表示）
+- 全画面オーバーレイメニュー
+  - メインナビゲーション（Home, About, RSS）
+  - カテゴリ一覧（上位10件＋テーマカテゴリ）
+  - タグ一覧（上位12件）
+
+**ロジック**:
+- React Portalで`<body>`直下にレンダリング
+- パス変更時に自動クローズ
+- デスクトップサイズ（768px以上）に変更時に自動クローズ
+- メニューオープン時に`body`のスクロールを無効化
+
+**スタイル**:
+- オーバーレイ: rgba背景
+- メニュー: 右からスライドイン、白背景
+- CSS: globals.cssに`.mobile-menu`クラス定義
+
+---
+
+### YouTube（埋め込み）
+
+**役割**: YouTube動画の埋め込み
+
+**Props**:
+```typescript
+interface Props {
+  videoId: string;
+  title?: string;
+  start?: number; // 開始秒数（オプション）
+}
+```
+
+**構成**:
+- iframeでYouTube埋め込み
+- 16:9アスペクト比維持
+- lazy loading有効
+
+**スタイル**:
+- 最大幅: 4xl (896px)
+- 中央寄せ、角丸、影付き
+
+---
+
+### GoogleMap（埋め込み）
+
+**役割**: Googleマップの埋め込み
+
+**Props**:
+```typescript
+interface Props {
+  src: string;   // Google Maps埋め込みURL
+  title?: string;
+}
+```
+
+**構成**:
+- iframeでGoogleマップ埋め込み
+- 4:3アスペクト比
+- lazy loading有効
+
+**スタイル**:
+- 最大幅: 4xl (896px)
+- 中央寄せ、角丸、ボーダー、影付き
+
+---
+
+### Instagram（埋め込み）
+
+**役割**: Instagram投稿の埋め込み
+
+**Props**:
+```typescript
+interface Props {
+  url: string;       // Instagram投稿URL
+  caption?: boolean; // キャプション表示（デフォルト: true）
+}
+```
+
+**構成**:
+- Instagram公式embed.jsスクリプトを動的ロード
+- blockquote要素でInstagram投稿を埋め込み
+
+**ロジック**:
+- クライアントコンポーネント
+- useEffectでスクリプトロード
+- スクリプトが既にロード済みの場合は再利用
+
+**スタイル**:
+- 最大幅: 540px
+- 中央寄せ
+- Instagram公式スタイル（白背景、影付き）
+
+---
+
 ## Server/Client Component
 
 | コンポーネント | 種類 | 理由 |
@@ -227,3 +429,10 @@ interface ShareButtonsProps {
 | Lightbox | Client | イベントリスナー |
 | ShareButtons | Client | URL生成のため |
 | ScrollToTop | Client | スクロール監視 |
+| **SearchBox** | **Client** | **useRouter使用** |
+| **MonthlyArchive** | **Client** | **アコーディオン開閉状態管理** |
+| **CategoryAccordion** | **Client** | **アコーディオン開閉状態管理** |
+| **MobileMenu** | **Client** | **メニュー開閉状態管理、Portal使用** |
+| **YouTube** | **Server** | **静的埋め込みのみ** |
+| **GoogleMap** | **Server** | **静的埋め込みのみ** |
+| **Instagram** | **Client** | **スクリプト動的ロード** |

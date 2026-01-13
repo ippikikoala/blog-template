@@ -1,0 +1,52 @@
+# robots.txt for ippiki-koala.com
+
+# 一般的なクローラーは許可
+User-agent: *
+Allow: /
+
+# AIクローラーをブロック
+
+# OpenAI (ChatGPT)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+# Anthropic (Claude)
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+# Common Crawl (多くのAIモデルの学習データソース)
+User-agent: CCBot
+Disallow: /
+
+# Google Bard/Gemini (検索とは別のAI学習用)
+User-agent: Google-Extended
+Disallow: /
+
+# Meta AI
+User-agent: FacebookBot
+Disallow: /
+
+# Apple AI
+User-agent: Applebot-Extended
+Disallow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Disallow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Disallow: /
+
+# Cohere
+User-agent: cohere-ai
+Disallow: /
+
+# サイトマップ
+Sitemap: https://ippiki-koala.com/sitemap.xml
