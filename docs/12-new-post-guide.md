@@ -228,6 +228,51 @@ _画像のキャプション_
 ```
 外部サイトも同様の書き方でOKです。標準的なMarkdown記法が使えます。
 
+### リンクカード（OGPプレビュー）
+
+外部リンクをカード形式で表示したい場合に使用します。リンク先のOGP情報（タイトル、説明、画像）が自動取得されます。
+
+```jsx
+<LinkCard url="https://example.com/article" />
+```
+
+> [!WARNING]
+> **必ず独立した段落として配置してください**
+>
+> `<LinkCard />` コンポーネントは**前後に空行を入れて**配置する必要があります。
+> 文章の途中に配置すると、正しく表示されない場合があります。
+>
+> **❌ NG**:
+> ```markdown
+> 参考記事はこちら：<LinkCard url="xxx" />
+> ```
+>
+> **✅ OK（正しい）**:
+> ```markdown
+> 参考記事はこちら：
+>
+> <LinkCard url="xxx" />
+> ```
+
+#### オプション
+
+| プロパティ | 型 | 必須 | 説明 |
+|-----------|-----|------|------|
+| `url` | string | ○ | リンク先URL |
+| `title` | string | - | カスタムタイトル（省略時はOGPから取得） |
+| `description` | string | - | カスタム説明文（省略時はOGPから取得） |
+| `image` | string | - | カスタム画像URL（省略時はOGPから取得） |
+
+**カスタム指定の例**:
+```jsx
+<LinkCard
+  url="https://example.com/article"
+  title="カスタムタイトル"
+  description="カスタム説明文"
+  image="https://example.com/image.jpg"
+/>
+```
+
 ### コメントアウト
 
 ```markdown

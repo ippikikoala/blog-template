@@ -19,6 +19,7 @@ import { slug as slugify } from "github-slugger";
 import YouTube from "@/components/embeds/YouTube";
 import GoogleMap from "@/components/embeds/GoogleMap";
 import Instagram from "@/components/embeds/Instagram";
+import LinkCard from "@/components/embeds/LinkCard";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -164,6 +165,7 @@ export default async function PostPage({ params }: Props) {
                   YouTube,
                   GoogleMap,
                   Instagram,
+                  LinkCard,
                 }}
               />
             </div>

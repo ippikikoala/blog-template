@@ -20,7 +20,8 @@ src/components/
 └── embeds/
     ├── YouTube.tsx         # YouTube埋め込み
     ├── GoogleMap.tsx       # Googleマップ埋め込み
-    └── Instagram.tsx       # Instagram埋め込み
+    ├── Instagram.tsx       # Instagram埋め込み
+    └── LinkCard.tsx        # リンクカード（OGPプレビュー）
 ```
 
 ## 各コンポーネント仕様
@@ -416,6 +417,39 @@ interface Props {
 
 ---
 
+### LinkCard（埋め込み）
+
+**役割**: 外部リンクのOGPカード表示
+
+**Props**:
+```typescript
+interface Props {
+  url: string;           // リンク先URL（必須）
+  title?: string;        // カスタムタイトル（省略時はOGPから取得）
+  description?: string;  // カスタム説明文（省略時はOGPから取得）
+  image?: string;        // カスタム画像URL（省略時はOGPから取得）
+}
+```
+
+**構成**:
+- リンク先のOGP情報を自動取得してカード表示
+- タイトル、説明文、サイト名、OGP画像を表示
+- カード全体がリンク
+
+**ロジック**:
+- サーバーコンポーネント（async/await）
+- ビルド時にOGP情報をfetch
+- 24時間キャッシュ（`next: { revalidate: 86400 }`）
+- OGP取得失敗時はURLをそのまま表示
+
+**スタイル**:
+- 横長カード（左にテキスト、右に画像）
+- ボーダー: var(--border-color)
+- ホバー時: 背景色変更
+- 画像幅: 160px
+
+---
+
 ## Server/Client Component
 
 | コンポーネント | 種類 | 理由 |
@@ -436,3 +470,4 @@ interface Props {
 | **YouTube** | **Server** | **静的埋め込みのみ** |
 | **GoogleMap** | **Server** | **静的埋め込みのみ** |
 | **Instagram** | **Client** | **スクリプト動的ロード** |
+| **LinkCard** | **Server** | **ビルド時OGP取得** |
