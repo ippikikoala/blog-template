@@ -10,6 +10,8 @@
 /categories/[category]      # カテゴリ別記事一覧
 /tags                       # タグ一覧
 /tags/[tag]                 # タグ別記事一覧
+/search                     # 検索ページ
+/archive/[year]/[month]     # 月別アーカイブ
 /about                      # Aboutページ
 /feed.xml                   # RSSフィード
 ```
@@ -191,6 +193,77 @@ const posts = getPostsByTag(decodedTag);
 
 ---
 
+### 検索ページ `/search`
+
+**目的**: 記事の全文検索
+
+**構成**:
+- 検索フォーム
+- 検索結果一覧（記事カードグリッド）
+- 検索結果件数表示
+- サイドバー
+
+**機能**:
+- クライアントサイド検索（Client Component）
+- タイトル、説明、本文を対象に検索
+- クエリパラメータ対応（`/search?q=温泉`）
+
+**データ取得**:
+```typescript
+// 静的に全記事データを生成し、クライアントで検索
+const allPosts = getAllPosts();
+const results = allPosts.filter(post =>
+  post.title.includes(query) ||
+  post.description.includes(query) ||
+  post.content?.includes(query)
+);
+```
+
+---
+
+### 月別アーカイブ `/archive/[year]/[month]`
+
+**目的**: 特定月の記事一覧
+
+**構成**:
+- 見出し「{年}年{月}月の記事一覧」
+- 件数表示
+- 記事カードグリッド
+- サイドバー
+
+**パラメータ**:
+- `year`: 年（4桁の数字）
+- `month`: 月（1-2桁の数字）
+
+**静的生成**:
+```typescript
+export async function generateStaticParams() {
+  const posts = getAllPosts();
+  const yearMonths = new Set<string>();
+
+  posts.forEach(post => {
+    const date = new Date(post.date);
+    yearMonths.add(`${date.getFullYear()}-${date.getMonth() + 1}`);
+  });
+
+  return Array.from(yearMonths).map(ym => {
+    const [year, month] = ym.split('-');
+    return { year, month };
+  });
+}
+```
+
+**データ取得**:
+```typescript
+const posts = getAllPosts().filter(post => {
+  const date = new Date(post.date);
+  return date.getFullYear() === parseInt(year) &&
+         date.getMonth() + 1 === parseInt(month);
+});
+```
+
+---
+
 ### RSSフィード `/feed.xml`
 
 **目的**: RSS配信
@@ -213,6 +286,10 @@ src/app/
 ├── globals.css             # グローバルスタイル
 ├── about/
 │   └── page.tsx            # Aboutページ
+├── archive/
+│   └── [year]/
+│       └── [month]/
+│           └── page.tsx    # 月別アーカイブ
 ├── categories/
 │   ├── page.tsx            # カテゴリ一覧
 │   └── [category]/
@@ -227,6 +304,8 @@ src/app/
 ├── page/
 │   └── [page]/
 │       └── page.tsx        # ページネーション
+├── search/
+│   └── page.tsx            # 検索ページ
 └── feed.xml/
     └── route.ts            # RSSフィード
 ```

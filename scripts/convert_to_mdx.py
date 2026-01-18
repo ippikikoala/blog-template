@@ -183,7 +183,26 @@ def convert_hatena_syntax(body, image_mapping, r2_public_url):
 
     body = re.sub(r'<ul style="list-style: none[^"]*"[^>]*>(.*?)</ul>', convert_code_block, body, flags=re.DOTALL)
 
-    # 2. はてなブログの埋め込みコンテンツを削除
+    # 2. YouTube埋め込みをMDXコンポーネントに変換
+    def convert_youtube_iframe(match):
+        iframe_content = match.group(0)
+        # src属性からvideoIdを抽出
+        # パターン1: https://www.youtube.com/embed/VIDEO_ID
+        video_id_match = re.search(r'youtube\.com/embed/([a-zA-Z0-9_-]+)', iframe_content)
+        if video_id_match:
+            video_id = video_id_match.group(1)
+            # title属性があれば取得
+            title_match = re.search(r'title="([^"]*)"', iframe_content)
+            title = title_match.group(1) if title_match else ""
+            if title:
+                return f'\n\n<YouTube videoId="{video_id}" title="{title}" />\n\n'
+            else:
+                return f'\n\n<YouTube videoId="{video_id}" />\n\n'
+        return ''
+
+    body = re.sub(r'<iframe[^>]*youtube\.com/embed[^>]*>.*?</iframe>', convert_youtube_iframe, body, flags=re.DOTALL)
+
+    # 2.5. はてなブログの埋め込みコンテンツを削除
     body = re.sub(r'<iframe[^>]*src="https://hatenablog-parts\.com/embed[^>]*>.*?</iframe>', '', body, flags=re.DOTALL)
     body = re.sub(r'<iframe[^>]*src="https://www\.google\.com/maps/embed[^>]*>.*?</iframe>', '\n\n[Google Maps埋め込み]\n\n', body, flags=re.DOTALL)
 
